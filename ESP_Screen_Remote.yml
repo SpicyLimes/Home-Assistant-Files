@@ -1,0 +1,842 @@
+# Version 2
+# Changes from Version 1:
+# - Added 3-page navigation system (Default, Button Grid, Entity States)
+# - Changed button shapes from circles to squirkles (rounded rectangles, 12px radius)
+# - Expanded from 4 buttons to 21 total configurable buttons
+# - Added configurable entity states display (8 entities)
+# - Modified top status bar with HA connection, WiFi signal/status
+# - Removed time from Default Screen top bar (clock displayed in center)
+# - Added 10-second timeout to return to Default Screen
+# - Added chevron navigation on all pages
+# - Created easy-to-edit configuration section for entities and icons
+# - Simplified color scheme: Amber for ON, Grey for OFF (no dynamic light colors)
+
+esphome:
+  name: esp-remote-screen
+  friendly_name: ESP Remote Screen
+  min_version: 2025.5.0
+  name_add_mac_suffix: false
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+logger:
+
+api:
+
+ota:
+- platform: esphome
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+time:
+  - platform: homeassistant
+    id: ha_time
+    timezone: "America/Chicago"
+    on_time:
+      - seconds: 0
+        minutes: /1
+        then:
+          - component.update: my_display    
+
+# ==================================================================
+# CONFIGURATION SECTION - EDIT YOUR ENTITIES AND ICONS HERE
+# ==================================================================
+# Find MDI Icons at: https://pictogrammers.com/library/mdi/
+# Icon format: "\U000F" + icon code (e.g., lightbulb = 0335, so "\U000F0335")
+#
+# EDIT BUTTON ICONS BELOW - Change the unicode values for each button's icon
+# Common icons:
+#   Lightbulb: \U000F0335
+#   LED Strip: \U000F1051
+#   Printer 3D: \U000F0E5B
+#   Switch: \U000F06C8
+#   Fan: \U000F0322
+#   Power: \U000F0425
+# ==================================================================
+
+globals:
+  - id: current_page
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: page_timeout
+    type: int
+    restore_value: no
+    initial_value: '0'
+  # BUTTON ICON CONFIGURATION - Edit these unicode values
+  - id: button1_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F0335"'  # EDIT: Button 1 icon
+  - id: button2_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F0E5B"'  # EDIT: Button 2 icon
+  - id: button3_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F1051"'  # EDIT: Button 3 icon
+  - id: button4_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F06C8"'  # EDIT: Button 4 icon
+  - id: button5_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F0322"'  # EDIT: Button 5 icon
+  - id: button6_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F0335"'  # EDIT: Button 6 icon
+  - id: button7_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F0335"'  # EDIT: Button 7 icon
+  - id: button8_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F0335"'  # EDIT: Button 8 icon
+  - id: button9_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F0335"'  # EDIT: Button 9 icon
+  - id: button10_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F0335"'  # EDIT: Button 10 icon
+  - id: button11_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F0335"'  # EDIT: Button 11 icon
+  - id: button12_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F0335"'  # EDIT: Button 12 icon
+  - id: button13_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F0335"'  # EDIT: Button 13 icon
+  - id: button14_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F0335"'  # EDIT: Button 14 icon
+  - id: button15_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F0335"'  # EDIT: Button 15 icon
+  - id: button16_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F0335"'  # EDIT: Button 16 icon
+  - id: button17_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F0335"'  # EDIT: Button 17 icon
+  - id: button18_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F0335"'  # EDIT: Button 18 icon
+  - id: button19_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F0335"'  # EDIT: Button 19 icon
+  - id: button20_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F0335"'  # EDIT: Button 20 icon
+  - id: button21_icon
+    type: std::string
+    restore_value: no
+    initial_value: '"\U000F0335"'  # EDIT: Button 21 icon
+
+font: 
+  - file: "gfonts://Roboto@500"
+    id: big_text
+    size: 60
+    bpp: 4
+
+  - file: "gfonts://Roboto@400"
+    id: medium_text
+    size: 24
+    bpp: 4
+
+  - file: "gfonts://Roboto@300"
+    id: small_text
+    size: 16
+    bpp: 4
+
+  - file: "gfonts://Roboto@400"
+    id: label
+    size: 13
+    bpp: 4
+
+  - file: "gfonts://Roboto@300"
+    id: status_font
+    size: 11
+    bpp: 4
+
+  - file: 'https://www.spicylimes.com/_fonts/materialdesignicons-webfont.ttf'
+    id: icon_font_small
+    size: 24
+    glyphs: [
+      "\U000F0335", "\U000F0E5B", "\U000F1051", "\U000F1A82",
+      "\U000F0141", "\U000F0142", "\U000F092F", "\U000F091F",
+      "\U000F0920", "\U000F0922", "\U000F092B", "\U000F0504",
+      "\U000F0159", "\U000F06C8", "\U000F0322", "\U000F0C7E",
+      "\U000F0425"
+      ]
+
+  - file: 'https://www.spicylimes.com/_fonts/materialdesignicons-webfont.ttf'
+    id: icon_font_large
+    size: 35
+    glyphs: [
+      "\U000F0335", "\U000F0E5B", "\U000F1051", "\U000F1A82",
+      "\U000F06C8", "\U000F0322", "\U000F0C7E", "\U000F0425"
+      ]
+          
+color:
+  - id: AMBER
+    hex: "FEC600"  
+  - id: GREY
+    hex: "505050"  
+  - id: WHITE
+    hex: "FFFFFF"
+  - id: BLACK
+    hex: "000000"
+  - id: GREEN
+    hex: "00FF00"
+  - id: RED
+    hex: "FF0000"
+
+sensor:
+  - platform: wifi_signal
+    name: "Wifi Signal"
+    id: wifi_signal_db
+    update_interval: 60s  
+  - platform: uptime
+    name: "Uptime"
+    id: uptime_s
+    update_interval: 15s       
+
+binary_sensor:
+  - platform: status
+    name: "Node Status"
+    id: system_status
+
+  # Navigation - Left Chevron
+  - platform: touchscreen
+    name: "Nav Left"
+    id: nav_left
+    x_min: 0
+    x_max: 40    
+    y_min: 100
+    y_max: 140
+    on_press:
+      then:
+        - lambda: |-
+            id(page_timeout) = 0;
+            id(current_page) = (id(current_page) - 1 + 3) % 3;
+            id(my_display).show_page(id(current_page));
+        - component.update: my_display
+
+  # Navigation - Right Chevron  
+  - platform: touchscreen
+    name: "Nav Right"
+    id: nav_right
+    x_min: 280
+    x_max: 320    
+    y_min: 100
+    y_max: 140
+    on_press:
+      then:
+        - lambda: |-
+            id(page_timeout) = 0;
+            id(current_page) = (id(current_page) + 1) % 3;
+            id(my_display).show_page(id(current_page));
+        - component.update: my_display
+
+  # Default Screen Buttons (1-5)
+  - platform: touchscreen
+    name: "Button 1"
+    x_min: 10
+    x_max: 62    
+    y_min: 190
+    y_max: 230
+  - platform: touchscreen
+    name: "Button 2"
+    x_min: 72
+    x_max: 124  
+    y_min: 190
+    y_max: 230   
+  - platform: touchscreen
+    name: "Button 3"
+    x_min: 134
+    x_max: 186   
+    y_min: 190
+    y_max: 230
+  - platform: touchscreen
+    name: "Button 4"
+    x_min: 196
+    x_max: 248     
+    y_min: 190
+    y_max: 230
+  - platform: touchscreen
+    name: "Button 5"
+    x_min: 258
+    x_max: 310     
+    y_min: 190
+    y_max: 230
+
+  # Button Screen Grid (6-21)
+  - platform: touchscreen
+    name: "Button 6"
+    x_min: 10
+    x_max: 70    
+    y_min: 40
+    y_max: 90
+  - platform: touchscreen
+    name: "Button 7"
+    x_min: 90
+    x_max: 150  
+    y_min: 40
+    y_max: 90   
+  - platform: touchscreen
+    name: "Button 8"
+    x_min: 170
+    x_max: 230   
+    y_min: 40
+    y_max: 90
+  - platform: touchscreen
+    name: "Button 9"
+    x_min: 250
+    x_max: 310     
+    y_min: 40
+    y_max: 90
+  - platform: touchscreen
+    name: "Button 10"
+    x_min: 10
+    x_max: 70    
+    y_min: 100
+    y_max: 150
+  - platform: touchscreen
+    name: "Button 11"
+    x_min: 90
+    x_max: 150  
+    y_min: 100
+    y_max: 150   
+  - platform: touchscreen
+    name: "Button 12"
+    x_min: 170
+    x_max: 230   
+    y_min: 100
+    y_max: 150
+  - platform: touchscreen
+    name: "Button 13"
+    x_min: 250
+    x_max: 310     
+    y_min: 100
+    y_max: 150
+  - platform: touchscreen
+    name: "Button 14"
+    x_min: 10
+    x_max: 70    
+    y_min: 160
+    y_max: 210
+  - platform: touchscreen
+    name: "Button 15"
+    x_min: 90
+    x_max: 150  
+    y_min: 160
+    y_max: 210   
+  - platform: touchscreen
+    name: "Button 16"
+    x_min: 170
+    x_max: 230   
+    y_min: 160
+    y_max: 210
+  - platform: touchscreen
+    name: "Button 17"
+    x_min: 250
+    x_max: 310     
+    y_min: 160
+    y_max: 210
+  - platform: touchscreen
+    name: "Button 18"
+    x_min: 10
+    x_max: 70    
+    y_min: 220
+    y_max: 270
+  - platform: touchscreen
+    name: "Button 19"
+    x_min: 90
+    x_max: 150  
+    y_min: 220
+    y_max: 270   
+  - platform: touchscreen
+    name: "Button 20"
+    x_min: 170
+    x_max: 230   
+    y_min: 220
+    y_max: 270
+  - platform: touchscreen
+    name: "Button 21"
+    x_min: 250
+    x_max: 310     
+    y_min: 220
+    y_max: 270
+  
+text_sensor:
+  - platform: template
+    name: "Uptime (formatted)"
+    lambda: |-
+      uint32_t dur = id(uptime_s).state;
+      int dys = 0;
+      int hrs = 0;
+      int mnts = 0;
+      if (dur > 86399) {
+        dys = trunc(dur / 86400);
+        dur = dur - (dys * 86400);
+      }
+      if (dur > 3599) {
+        hrs = trunc(dur / 3600);
+        dur = dur - (hrs * 3600);
+      }
+      if (dur > 59) {
+        mnts = trunc(dur / 60);
+        dur = dur - (mnts * 60);
+      }
+      char buffer[17];
+      sprintf(buffer, "%ud %02uh %02um %02us", dys, hrs, mnts, dur);
+      return {buffer};
+    icon: mdi:clock-start
+    update_interval: 60s    
+
+  # =================================================================
+  # BUTTON ENTITIES - Edit entity_id values below
+  # =================================================================
+  - platform: homeassistant
+    id: button1_entity
+    entity_id: light.placeholder_1  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+  - platform: homeassistant
+    id: button2_entity
+    entity_id: switch.placeholder_2  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+  - platform: homeassistant
+    id: button3_entity
+    entity_id: light.placeholder_3  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+  - platform: homeassistant
+    id: button4_entity
+    entity_id: switch.placeholder_4  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display     
+  - platform: homeassistant
+    id: button5_entity
+    entity_id: light.placeholder_5  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+  - platform: homeassistant
+    id: button6_entity
+    entity_id: switch.placeholder_6  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+  - platform: homeassistant
+    id: button7_entity
+    entity_id: light.placeholder_7  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+  - platform: homeassistant
+    id: button8_entity
+    entity_id: switch.placeholder_8  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+  - platform: homeassistant
+    id: button9_entity
+    entity_id: light.placeholder_9  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+  - platform: homeassistant
+    id: button10_entity
+    entity_id: switch.placeholder_10  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+  - platform: homeassistant
+    id: button11_entity
+    entity_id: light.placeholder_11  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+  - platform: homeassistant
+    id: button12_entity
+    entity_id: switch.placeholder_12  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+  - platform: homeassistant
+    id: button13_entity
+    entity_id: light.placeholder_13  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+  - platform: homeassistant
+    id: button14_entity
+    entity_id: switch.placeholder_14  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+  - platform: homeassistant
+    id: button15_entity
+    entity_id: light.placeholder_15  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+  - platform: homeassistant
+    id: button16_entity
+    entity_id: switch.placeholder_16  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+  - platform: homeassistant
+    id: button17_entity
+    entity_id: light.placeholder_17  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+  - platform: homeassistant
+    id: button18_entity
+    entity_id: switch.placeholder_18  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+  - platform: homeassistant
+    id: button19_entity
+    entity_id: light.placeholder_19  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+  - platform: homeassistant
+    id: button20_entity
+    entity_id: switch.placeholder_20  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+  - platform: homeassistant
+    id: button21_entity
+    entity_id: light.placeholder_21  # EDIT THIS
+    on_value:
+      then:
+        - component.update: my_display
+
+  # =================================================================
+  # ENTITY STATES - Edit entity_id values for status display screen
+  # =================================================================
+  - platform: template
+    id: entity_state_1
+    name: "Entity State 1"
+    lambda: return {"Placeholder 1"};  # EDIT: Use HA template or hardcode
+  - platform: template
+    id: entity_state_2
+    name: "Entity State 2"
+    lambda: return {"Placeholder 2"};  # EDIT: Use HA template or hardcode
+  - platform: template
+    id: entity_state_3
+    name: "Entity State 3"
+    lambda: return {"Placeholder 3"};  # EDIT: Use HA template or hardcode
+  - platform: template
+    id: entity_state_4
+    name: "Entity State 4"
+    lambda: return {"Placeholder 4"};  # EDIT: Use HA template or hardcode
+  - platform: template
+    id: entity_state_5
+    name: "Entity State 5"
+    lambda: return {"Placeholder 5"};  # EDIT: Use HA template or hardcode
+  - platform: template
+    id: entity_state_6
+    name: "Entity State 6"
+    lambda: return {"Placeholder 6"};  # EDIT: Use HA template or hardcode
+  - platform: template
+    id: entity_state_7
+    name: "Entity State 7"
+    lambda: return {"Placeholder 7"};  # EDIT: Use HA template or hardcode
+  - platform: template
+    id: entity_state_8
+    name: "Entity State 8"
+    lambda: return {"Placeholder 8"};  # EDIT: Use HA template or hardcode
+
+switch:
+  - platform: restart
+    name: "Restart"  
+
+spi:
+  - id: lcd
+    clk_pin: GPIO14
+    mosi_pin: GPIO13
+    miso_pin: GPIO12
+  - id: my_touchscreen
+    clk_pin: GPIO25
+    mosi_pin: GPIO32
+    miso_pin: GPIO39  
+
+output:
+  - platform: ledc
+    pin: GPIO21
+    id: gpio_backlight_pwm
+  - platform: ledc
+    id: output_red
+    pin: GPIO4
+    inverted: true
+  - platform: ledc
+    id: output_green
+    pin: GPIO16
+    inverted: true
+  - platform: ledc
+    id: output_blue
+    pin: GPIO17
+    inverted: true    
+
+light:
+  - platform: monochromatic
+    output: gpio_backlight_pwm
+    name: "Power Display Backlight"
+    id: back_light
+    restore_mode: ALWAYS_ON        
+  - platform: rgb
+    name: LED
+    red: output_red
+    id: led
+    green: output_green
+    blue: output_blue
+    restore_mode: ALWAYS_OFF    
+
+touchscreen:
+  platform: xpt2046
+  spi_id: my_touchscreen
+  cs_pin: 33
+  interrupt_pin: 36
+  update_interval: 50ms
+  threshold: 400
+  on_touch:
+    - lambda: |-
+          ESP_LOGI("cal", "x=%d, y=%d, x_raw=%d, y_raw=%0d",
+              touch.x, touch.y, touch.x_raw, touch.y_raw);
+  calibration:
+    x_min: 280
+    x_max: 3860
+    y_min: 340
+    y_max: 3860
+  transform:
+    mirror_x: true
+    mirror_y: false     
+
+interval:
+  - interval: 1s
+    then:
+      - lambda: |-
+          if (id(current_page) != 0) {
+            id(page_timeout)++;
+            if (id(page_timeout) >= 10) {
+              id(current_page) = 0;
+              id(page_timeout) = 0;
+              id(my_display).show_page(0);
+              id(my_display).update();
+            }
+          }
+
+display:
+  - platform: ili9xxx
+    id: my_display
+    spi_id: lcd
+    model: ILI9341
+    color_palette: 8BIT
+    cs_pin:
+      number: 15
+      ignore_strapping_warning: true
+    dc_pin:
+      number: 2
+      ignore_strapping_warning: true
+    rotation: 0
+    invert_colors: false
+    dimensions:
+      height: 240
+      width: 320
+
+    pages:      
+      # PAGE 0: DEFAULT SCREEN
+      - id: page_default
+        lambda: |-
+          auto white = id(WHITE);
+          auto black = id(BLACK);
+          auto amber = id(AMBER);
+          auto grey = id(GREY);
+          auto green = id(GREEN);
+          auto red = id(RED);
+          
+          // Status Bar - NO TIME on default screen
+          it.filled_rectangle(0, 0, it.get_width(), 20, black);
+          
+          if (id(system_status).state) {
+            it.printf(10, 10, id(icon_font_small), green, TextAlign::CENTER_LEFT, "\U000F0504");
+            it.printf(30, 10, id(status_font), white, TextAlign::CENTER_LEFT, "Connected");
+          } else {
+            it.printf(10, 10, id(icon_font_small), red, TextAlign::CENTER_LEFT, "\U000F0159");
+            it.printf(30, 10, id(status_font), white, TextAlign::CENTER_LEFT, "Disconnected");
+          }
+          
+          float signal = id(wifi_signal_db).state;
+          const char* wifi_icon = (signal > -50) ? "\U000F092F" : (signal > -60) ? "\U000F0922" : (signal > -70) ? "\U000F0920" : (signal > -80) ? "\U000F091F" : "\U000F092B";
+          it.printf(310, 10, id(status_font), white, TextAlign::CENTER_RIGHT, "Online");
+          it.printf(270, 10, id(icon_font_small), white, TextAlign::CENTER_RIGHT, wifi_icon);
+
+          // Date & Time Display
+          std::map<uint8_t, std::string> day_map{{2,"Monday"},{3,"Tuesday"},{4,"Wednesday"},{5,"Thursday"},{6,"Friday"},{7,"Saturday"},{1,"Sunday"}};
+          std::map<uint8_t, std::string> month_map{{1,"January"},{2,"February"},{3,"March"},{4,"April"},{5,"May"},{6,"June"},{7,"July"},{8,"August"},{9,"September"},{10,"October"},{11,"November"},{12,"December"}};
+          
+          std::string day_of_week = day_map[id(ha_time).now().day_of_week];    
+          int day_of_month = id(ha_time).now().day_of_month;    
+          std::string month = month_map[id(ha_time).now().month];    
+          it.printf(160, 60, id(small_text), white, TextAlign::CENTER, "%s, %d %s", day_of_week.c_str(), day_of_month, month.c_str());  
+          it.strftime(160, 100, id(big_text), white, TextAlign::CENTER, "%I:%M %p", id(ha_time).now());
+
+          // Chevrons
+          it.printf(20, 120, id(icon_font_small), white, TextAlign::CENTER, "\U000F0141");
+          it.printf(300, 120, id(icon_font_small), white, TextAlign::CENTER, "\U000F0142");
+
+          // Bottom Button Row (5 buttons)
+          auto draw_button = [&](int x, int y, const char* icon, bool is_on) {
+            auto bg_color = is_on ? amber : grey;
+            it.filled_rounded_rectangle(x, y, 52, 40, 12, bg_color);
+            it.printf(x+26, y+20, id(icon_font_large), white, TextAlign::CENTER, icon);
+          };
+
+          draw_button(10, 190, id(button1_icon).c_str(), id(button1_entity).state == "on");
+          draw_button(72, 190, id(button2_icon).c_str(), id(button2_entity).state == "on");
+          draw_button(134, 190, id(button3_icon).c_str(), id(button3_entity).state == "on");
+          draw_button(196, 190, id(button4_icon).c_str(), id(button4_entity).state == "on");
+          draw_button(258, 190, id(button5_icon).c_str(), id(button5_entity).state == "on");
+
+      # PAGE 1: BUTTON GRID SCREEN
+      - id: page_buttons
+        lambda: |-
+          auto white = id(WHITE);
+          auto black = id(BLACK);
+          auto amber = id(AMBER);
+          auto grey = id(GREY);
+          auto green = id(GREEN);
+          auto red = id(RED);
+          
+          // Status Bar WITH TIME
+          it.filled_rectangle(0, 0, it.get_width(), 20, black);
+          
+          if (id(system_status).state) {
+            it.printf(5, 10, id(icon_font_small), green, TextAlign::CENTER_LEFT, "\U000F0504");
+            it.printf(22, 10, id(status_font), white, TextAlign::CENTER_LEFT, "Conn");
+          } else {
+            it.printf(5, 10, id(icon_font_small), red, TextAlign::CENTER_LEFT, "\U000F0159");
+            it.printf(22, 10, id(status_font), white, TextAlign::CENTER_LEFT, "Disc");
+          }
+          
+          it.strftime(160, 10, id(status_font), white, TextAlign::CENTER, "%I:%M %p", id(ha_time).now());
+          
+          float signal = id(wifi_signal_db).state;
+          const char* wifi_icon = (signal > -50) ? "\U000F092F" : (signal > -60) ? "\U000F0922" : (signal > -70) ? "\U000F0920" : (signal > -80) ? "\U000F091F" : "\U000F092B";
+          it.printf(315, 10, id(status_font), white, TextAlign::CENTER_RIGHT, "OK");
+          it.printf(290, 10, id(icon_font_small), white, TextAlign::CENTER_RIGHT, wifi_icon);
+
+          // Chevrons
+          it.printf(20, 120, id(icon_font_small), white, TextAlign::CENTER, "\U000F0141");
+          it.printf(300, 120, id(icon_font_small), white, TextAlign::CENTER, "\U000F0142");
+
+          // Button Grid (4x4 = 16 buttons, buttons 6-21)
+          auto draw_btn = [&](int x, int y, const char* icon, bool is_on) {
+            auto bg = is_on ? amber : grey;
+            it.filled_rounded_rectangle(x, y, 60, 50, 12, bg);
+            it.printf(x+30, y+25, id(icon_font_large), white, TextAlign::CENTER, icon);
+          };
+
+          // Row 1
+          draw_btn(10, 40, id(button6_icon).c_str(), id(button6_entity).state == "on");
+          draw_btn(90, 40, id(button7_icon).c_str(), id(button7_entity).state == "on");
+          draw_btn(170, 40, id(button8_icon).c_str(), id(button8_entity).state == "on");
+          draw_btn(250, 40, id(button9_icon).c_str(), id(button9_entity).state == "on");
+          // Row 2
+          draw_btn(10, 100, id(button10_icon).c_str(), id(button10_entity).state == "on");
+          draw_btn(90, 100, id(button11_icon).c_str(), id(button11_entity).state == "on");
+          draw_btn(170, 100, id(button12_icon).c_str(), id(button12_entity).state == "on");
+          draw_btn(250, 100, id(button13_icon).c_str(), id(button13_entity).state == "on");
+          // Row 3
+          draw_btn(10, 160, id(button14_icon).c_str(), id(button14_entity).state == "on");
+          draw_btn(90, 160, id(button15_icon).c_str(), id(button15_entity).state == "on");
+          draw_btn(170, 160, id(button16_icon).c_str(), id(button16_entity).state == "on");
+          draw_btn(250, 160, id(button17_icon).c_str(), id(button17_entity).state == "on");
+          // Row 4
+          draw_btn(10, 220, id(button18_icon).c_str(), id(button18_entity).state == "on");
+          draw_btn(90, 220, id(button19_icon).c_str(), id(button19_entity).state == "on");
+          draw_btn(170, 220, id(button20_icon).c_str(), id(button20_entity).state == "on");
+          draw_btn(250, 220, id(button21_icon).c_str(), id(button21_entity).state == "on");
+
+      # PAGE 2: ENTITY STATES SCREEN
+      - id: page_entity_states
+        lambda: |-
+          auto white = id(WHITE);
+          auto black = id(BLACK);
+          auto green = id(GREEN);
+          auto red = id(RED);
+          
+          // Status Bar WITH TIME
+          it.filled_rectangle(0, 0, it.get_width(), 20, black);
+          
+          if (id(system_status).state) {
+            it.printf(5, 10, id(icon_font_small), green, TextAlign::CENTER_LEFT, "\U000F0504");
+            it.printf(22, 10, id(status_font), white, TextAlign::CENTER_LEFT, "Conn");
+          } else {
+            it.printf(5, 10, id(icon_font_small), red, TextAlign::CENTER_LEFT, "\U000F0159");
+            it.printf(22, 10, id(status_font), white, TextAlign::CENTER_LEFT, "Disc");
+          }
+          
+          it.strftime(160, 10, id(status_font), white, TextAlign::CENTER, "%I:%M %p", id(ha_time).now());
+          
+          float signal = id(wifi_signal_db).state;
+          const char* wifi_icon = (signal > -50) ? "\U000F092F" : (signal > -60) ? "\U000F0922" : (signal > -70) ? "\U000F0920" : (signal > -80) ? "\U000F091F" : "\U000F092B";
+          it.printf(315, 10, id(status_font), white, TextAlign::CENTER_RIGHT, "OK");
+          it.printf(290, 10, id(icon_font_small), white, TextAlign::CENTER_RIGHT, wifi_icon);
+
+          // Chevrons
+          it.printf(20, 120, id(icon_font_small), white, TextAlign::CENTER, "\U000F0141");
+          it.printf(300, 120, id(icon_font_small), white, TextAlign::CENTER, "\U000F0142");
+
+          // Entity Status Display (8 items, mixed small/large fonts)
+          // Entity 1 - Small
+          it.printf(10, 40, id(small_text), white, TextAlign::LEFT, "%s", id(entity_state_1).state.c_str());
+          // Entity 2 - Small
+          it.printf(160, 40, id(small_text), white, TextAlign::LEFT, "%s", id(entity_state_2).state.c_str());
+          // Entity 3 - Small
+          it.printf(10, 65, id(small_text), white, TextAlign::LEFT, "%s", id(entity_state_3).state.c_str());
+          // Entity 4 - Large
+          it.printf(10, 95, id(medium_text), white, TextAlign::LEFT, "%s", id(entity_state_4).state.c_str());
+          // Entity 5 - Large
+          it.printf(10, 130, id(medium_text), white, TextAlign::LEFT, "%s", id(entity_state_5).state.c_str());
+          // Entity 6 - Small
+          it.printf(10, 165, id(small_text), white, TextAlign::LEFT, "%s", id(entity_state_6).state.c_str());
+          // Entity 7 - Small
+          it.printf(160, 165, id(small_text), white, TextAlign::LEFT, "%s", id(entity_state_7).state.c_str());
+          // Entity 8 - Small
+          it.printf(10, 190, id(small_text), white, TextAlign::LEFT, "%s", id(entity_state_8).state.c_str());
