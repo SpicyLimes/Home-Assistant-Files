@@ -1,0 +1,5 @@
+blueprint:
+  name: "NAME (Remix)"
+  author: "SpicyLimes (Original: ORIGINALAUTHOR)"
+  description: "*Remixed Version of ORIGINALNAME* \n\n Original by [ORIGINALAUTHOR](ORIGINALLINK)\n\n"
+  source_url: https://github.com/SpicyLimes/Home-Assistant-Files/blob/main/Blueprints/TYPE/NAME.yaml
