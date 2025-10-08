@@ -1,8 +1,9 @@
 blueprint:
   name: YAMAMAMAMAMA
-  description: "Remixed Version of Yet Another Motion Automation"
+  description: "Remixed Version of Yet Another Motion Automation by NetworkingCat:\n https://gist.github.com/networkingcat/a1876d7e706e07c8bdcf974113940fb8"
   domain: automation
-  source_url: https://raw.githubusercontent.com/SpicyLimes/Home-Assistant-Files/refs/heads/main/Blueprints/YAMAMAMAMAMA.yaml
+  author: SpicyLimes
+  source_url: https://gist.github.com/SpicyLimes/d08b5957484633fd6710c18bd2cd53ba
   input:
     sensor_entity:
       name: Sensor
@@ -256,5 +257,3 @@ action:
       default:
       - service: light.turn_off
         target: !input entity_target
-
-
