@@ -4,6 +4,7 @@ blueprint:
   domain: automation
   author: SpicyLimes
   source_url: https://gist.github.com/SpicyLimes/d08b5957484633fd6710c18bd2cd53ba
+  # source_url: https://github.com/SpicyLimes/Home-Assistant-Files/blob/main/Blueprints/YAMAMAMAMAMA.yaml
   input:
     sensor_entity:
       name: Sensor
@@ -257,3 +258,4 @@ action:
       default:
       - service: light.turn_off
         target: !input entity_target
+
