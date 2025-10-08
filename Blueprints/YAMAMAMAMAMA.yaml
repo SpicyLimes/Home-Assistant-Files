@@ -1,29 +1,19 @@
 blueprint:
-  name: Yet Another Motion Automation
-  description: "# YAMA V10\n\nTurn on lights or scenes when motion is detected. \nFour
-    different scenes can be defined depending on time of day.\n\nFor Details see this
-    forum post:\nhttps://community.home-assistant.io/t/yama-yet-another-motion-automation-scenes-ambient-light-and-some-conditions/257062?u=networkingcat\n\nCapabilitys:\n\n
-    - Trigger on motion (in fact can be triggered by anything that switches between
-    “on” and off\")\n - Wait time for turning off\n - Only run if entity is in desired
-    state (optional)\n - Sun elevation check (optional)\n - 4 Scenes for different
-    times of day (optional)\n - Ambient support with time frame (optional)\n - Default
-    scene when motion stops (optional)\n - “no motion blocker” with user choosable
-    state (optional)\n"
+  name: YAMAMAMAMAMA
+  description: "Remixed Version of Yet Another Motion Automation"
   domain: automation
-  source_url: https://gist.github.com/networkingcat/a1876d7e706e07c8bdcf974113940fb8
+  source_url: https://raw.githubusercontent.com/SpicyLimes/Home-Assistant-Files/refs/heads/main/Blueprints/YAMAMAMAMAMA.yaml?token=GHSAT0AAAAAADHY3R2H24BJLC7MKODVDP3U2HG2WVQ
   input:
-    motion_entity:
-      name: Motion Sensor
-      description: Motion Sensor or a group with Motion Sensors (But can be anything
-        switching between "on" and "off")
+    sensor_entity:
+      name: Sensor
+      description: Sensor Entity
       selector:
         entity: {}
-    light_target:
-      name: Light
+    entity_target:
+      name: Entity
       selector:
         target:
           entity:
-            domain: light
     no_motion_wait:
       name: Wait time
       description: Time to leave the light on after last motion is detected.
@@ -48,18 +38,23 @@ blueprint:
       default: false
       selector:
         boolean: {}
-# START # Modify this Blueprint so that this section allows for two entities and functions in this manner: "If Entity 1 is [state] OR if Entity 2 is [state]"
     no_motion_blocker:
-      name: No Motion Blocker (Optional)
-      description: No motion sequence is not run if this boolean is in desired state
-        (see next input)
+      name: No Motion Blocker Entity 1 (Optional)
+      description: No motion sequence is not run if this entity is in desired state
+        (see next input). Works with OR logic if Entity 2 is also specified.
       default:
       selector:
         entity: {}
-# END #
+    no_motion_blocker_2:
+      name: No Motion Blocker Entity 2 (Optional)
+      description: Second entity for no motion blocker. No motion sequence is not run 
+        if Entity 1 OR Entity 2 is in desired state.
+      default:
+      selector:
+        entity: {}
     no_motion_blocker_boolean:
       name: No Motion Chooser (Optional)
-      description: Desired state of no motion blocker, choose on for on and off for
+      description: Desired state of no motion blocker entities, choose on for on and off for
         off
       default: false
       selector:
@@ -171,17 +166,18 @@ variables:
   automation_blocker: !input automation_blocker
   automation_blocker_boolean: !input automation_blocker_boolean
   no_motion_blocker: !input no_motion_blocker
+  no_motion_blocker_2: !input no_motion_blocker_2
   no_motion_blocker_boolean: !input no_motion_blocker_boolean
   elevation_check: !input elevation_check
   scene_no_motion: !input scene_no_motion
-  motion_entity: !input motion_entity
+  sensor_entity: !input sensor_entity
 trigger:
 - platform: state
-  entity_id: !input motion_entity
+  entity_id: !input sensor_entity
   from: 'off'
   to: 'on'
 - platform: state
-  entity_id: !input motion_entity
+  entity_id: !input sensor_entity
   from: 'on'
   to: 'off'
   for: !input no_motion_wait
@@ -233,17 +229,17 @@ action:
         - scene: !input scene_night
       default:
       - service: light.turn_on
-        target: !input light_target
+        target: !input entity_target
   - conditions:
     - condition: template
       value_template: '{{ trigger.to_state.state == ''off'' }}'
     - condition: or
       conditions:
-      - '{{ no_motion_blocker == none }}'
-      - '{{ no_motion_blocker_boolean and states[no_motion_blocker].state == ''on''
-        }}'
-      - '{{ not no_motion_blocker_boolean and states[no_motion_blocker].state == ''off''
-        }}'
+      - '{{ no_motion_blocker == none and no_motion_blocker_2 == none }}'
+      - '{{ no_motion_blocker_boolean and (states[no_motion_blocker].state == ''on''
+        or (no_motion_blocker_2 != none and states[no_motion_blocker_2].state == ''on'')) }}'
+      - '{{ not no_motion_blocker_boolean and (states[no_motion_blocker].state == ''off''
+        or (no_motion_blocker_2 != none and states[no_motion_blocker_2].state == ''off'')) }}'
     sequence:
     - choose:
       - conditions:
@@ -259,4 +255,4 @@ action:
         - scene: !input scene_no_motion
       default:
       - service: light.turn_off
-        target: !input light_target
+        target: !input entity_target
