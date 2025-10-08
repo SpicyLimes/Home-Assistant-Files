@@ -1,5 +1,5 @@
 blueprint:
-  name: YAMAMAMAMAMA
+  name: YAMAMAMAMAMA (Remix)
   description: "*Remixed Version of Yet Another Motion Automation* \n\n Original by [NetworkingCat](https://gist.github.com/networkingcat/a1876d7e706e07c8bdcf974113940fb8)"
   domain: automation
   author: SpicyLimes (Original: NetworkingCat)
@@ -258,3 +258,4 @@ action:
       default:
       - service: light.turn_off
         target: !input entity_target
+
