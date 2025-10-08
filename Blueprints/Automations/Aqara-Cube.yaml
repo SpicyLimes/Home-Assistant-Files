@@ -1,7 +1,7 @@
 blueprint:
   name: "Aqara Cube (Remix)"
   author: "SpicyLimes (Original: SirGoodenough)"
-  description: "Remixed Version of ZHA-Xiomi Cube Controller by [SirGoodenough](https://community.home-assistant.io/t/zha-xiaomi-cube-controller/495975) \n\n
+  description: "*Remixed Version of ZHA-Xiomi Cube Controller* \n\n Original by [SirGoodenough](https://community.home-assistant.io/t/zha-xiaomi-cube-controller/495975) \n\n
     This Blueprint uses a Z2M Event Sensor to sort out the 38(+54) unique
     actions available from the Xiaomi Magic Cube Remote. (Some unique actions are
     available thru templating only. See the related document.)\nThe split out of functions
@@ -50,8 +50,6 @@ blueprint:
     expected to be followed & referenced as attribution should you use this code elsewhere.\n"
   source_url: https://github.com/SpicyLimes/Home-Assistant-Files/blob/main/Blueprints/Automations/Aqara-Cube.yaml
   domain: automation
-  homeassistant:
-    min_version: 2024.6.0
   input:
     required_input:
       name: "Required input \U0001F440"
