@@ -1,5 +1,5 @@
 blueprint:
-  name: Aqara Magic Cube ZHA
+  name: Aqara Cube (Remix)
   author: "SpicyLimes (Original: SirGoodenough)"
   description: "Remixed Version of ZHA-Xiomi Cube Controller by [SirGoodenough](https://community.home-assistant.io/t/zha-xiaomi-cube-controller/495975) \n\n
     This Blueprint uses a Z2M Event Sensor to sort out the 38(+54) unique
