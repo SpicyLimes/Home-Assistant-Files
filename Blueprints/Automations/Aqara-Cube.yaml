@@ -564,7 +564,6 @@ blueprint:
           default: []
           selector:
             action: {}
-############################################3
     group_4_actions:
       name: "Group 4 actions"
       description: "Shake is supported; drop is not available on Cube T1 Pro."
@@ -779,4 +778,81 @@ action:
         sequence: !input 0_from_4
       - conditions: '{{ last_side == 5 }}'
         sequence: !input 0_from_5
-  # Repeat similar for side == 1 ... side == 5 using respective !input for group 3 actions.
+  - conditions: '{{ side == 0 }}'
+    sequence:
+      - choose:
+        - conditions: '{{ last_side == 1 }}'
+          sequence: !input 0_from_1
+        - conditions: '{{ last_side == 2 }}'
+          sequence: !input 0_from_2
+        - conditions: '{{ last_side == 3 }}'
+          sequence: !input 0_from_3
+        - conditions: '{{ last_side == 4 }}'
+          sequence: !input 0_from_4
+        - conditions: '{{ last_side == 5 }}'
+          sequence: !input 0_from_5
+  - conditions: '{{ side == 1 }}'
+    sequence:
+      - choose:
+        - conditions: '{{ last_side == 1 }}'
+          sequence: !input 1_from_1
+        - conditions: '{{ last_side == 2 }}'
+          sequence: !input 1_from_2
+        - conditions: '{{ last_side == 3 }}'
+          sequence: !input 1_from_3
+        - conditions: '{{ last_side == 4 }}'
+          sequence: !input 1_from_4
+        - conditions: '{{ last_side == 5 }}'
+          sequence: !input 1_from_5
+  - conditions: '{{ side == 2 }}'
+    sequence:
+      - choose:
+        - conditions: '{{ last_side == 1 }}'
+          sequence: !input 2_from_1
+        - conditions: '{{ last_side == 2 }}'
+          sequence: !input 2_from_2
+        - conditions: '{{ last_side == 3 }}'
+          sequence: !input 2_from_3
+        - conditions: '{{ last_side == 4 }}'
+          sequence: !input 2_from_4
+        - conditions: '{{ last_side == 5 }}'
+          sequence: !input 2_from_5
+  - conditions: '{{ side == 3 }}'
+    sequence:
+      - choose:
+        - conditions: '{{ last_side == 1 }}'
+          sequence: !input 3_from_1
+        - conditions: '{{ last_side == 2 }}'
+          sequence: !input 3_from_2
+        - conditions: '{{ last_side == 3 }}'
+          sequence: !input 3_from_3
+        - conditions: '{{ last_side == 4 }}'
+          sequence: !input 3_from_4
+        - conditions: '{{ last_side == 5 }}'
+          sequence: !input 3_from_5
+  - conditions: '{{ side == 4 }}'
+    sequence:
+      - choose:
+        - conditions: '{{ last_side == 1 }}'
+          sequence: !input 4_from_1
+        - conditions: '{{ last_side == 2 }}'
+          sequence: !input 4_from_2
+        - conditions: '{{ last_side == 3 }}'
+          sequence: !input 4_from_3
+        - conditions: '{{ last_side == 4 }}'
+          sequence: !input 4_from_4
+        - conditions: '{{ last_side == 5 }}'
+          sequence: !input 4_from_5
+  - conditions: '{{ side == 5 }}'
+    sequence:
+      - choose:
+        - conditions: '{{ last_side == 1 }}'
+          sequence: !input 5_from_1
+        - conditions: '{{ last_side == 2 }}'
+          sequence: !input 5_from_2
+        - conditions: '{{ last_side == 3 }}'
+          sequence: !input 5_from_3
+        - conditions: '{{ last_side == 4 }}'
+          sequence: !input 5_from_4
+        - conditions: '{{ last_side == 5 }}'
+          sequence: !input 5_from_5
