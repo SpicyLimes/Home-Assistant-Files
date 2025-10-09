@@ -1,6 +1,6 @@
 blueprint:
-  name: "Aqara Cube T1 Pro (ZHA)"
-  author: "SpicyLimes (Remix of SirGoodenough)"
+  name: "Aqara Cube T1 Pro via ZHA (Remix)"
+  author: "SpicyLimes"
   description: >
     Automate actions for the Aqara Cube T1 Pro using ZHA. Assign scripts to specific cube actions (slide, double-tap, rotate, flip, shake). Actions are grouped by specific side, any side, or flips between sides. Most actions can trigger multiple groups at once; assign actions in only one group to avoid double triggers. "Drop" is not supported on the Cube T1 Pro.
 
