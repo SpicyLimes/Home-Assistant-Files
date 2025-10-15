@@ -1,4 +1,6 @@
 blueprint:
+  author: "SpicyLimes"
+  source_url: https://github.com/SpicyLimes/Home-Assistant-Files/blob/main/Blueprints/Automations/Toggle-Activated-Devices.yaml
   name: Toggle Activated Devices
   description: Activate selected Switch Device(s) via the State of a Toggle (input_boolean).
   domain: automation
