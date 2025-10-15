@@ -9,7 +9,6 @@ blueprint:
       name: Toggle Entity
       selector:
         entity:
-          domain: toggle
     switch_target:
       name: Switch Device(s)
       selector:
