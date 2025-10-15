@@ -1,0 +1,49 @@
+blueprint:
+  name: Toggle Activated Devices
+  description: Activate selected Switch Device(s) via the State of a Toggle (input_boolean).
+  domain: automation
+  input:
+    toggle_entity:
+      name: Toggle Entity
+      selector:
+        entity:
+          domain: boolean
+    switch_target:
+      name: Switch Device(s)
+      selector:
+        target:
+          entity:
+            domain: switch
+    door_opened_wait:
+      name: Wait time
+      description: Time Delay to leave the devices ON after Toggle is OFF.
+      default: 3600
+      selector:
+        number:
+          min: 0
+          max: 7200
+          unit_of_measurement: seconds
+
+max_exceeded: silent
+
+trigger:
+  platform: state
+  entity_id: !input toggle_entity
+  from: "off"
+  to: "on"
+
+action:
+  - alias: "Turn ON the Switch Device(s)."
+    service: switch.turn_on
+    target: !input switch_target
+  - alias: "Wait until the Toggle Entity is OFF."
+    wait_for_trigger:
+      platform: state
+      entity_id: !input toggle_entity
+      from: "on"
+      to: "off"
+  - alias: "Wait the number of seconds that has been set before turning OFF the Switch Device(s)."
+    delay: !input door_opened_wait
+  - alias: "Turn OFF the Switch Device(s)"
+    service: switch.turn_off
+    target: !input switch_target
