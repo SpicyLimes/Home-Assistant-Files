@@ -1,1303 +1,1039 @@
 blueprint:
-  name: "Aqara Cube T1 Pro (CTP-R01)"
+  name: Aqara Magic Cube T1 Pro (CTP-R01)
   author: SirGoodenough
-  description: >
-    Control Zigbee2MQTT Aqara Cube T1 Pro (CTP-R01).
-    This blueprint supports all 58+ unique commands split into two modes:
-    - **Action Mode** (Side-specific, Any-side, Flips, Shake, Throw)
-    - **Scene Mode** (Rotate, Flip to side, Shake, Throw, Hold)
-    **Structure:**
-    - 🔴 **Group 1**: Actions ending on specific sides.
-    - 🟣 **Group 2**: Actions on *ANY* side.
-    - 🟢 **Group 3**: Flips from specific sides to specific sides.
-    - 🟡 **Group 4**: Single-occurrence actions (Shake, Throw, Hold).
-    **Notes:**
-    - Ensure your MQTT topic contains only alphanumeric characters (no spaces).
-    - If you see "TemplateError", verify your Z2M and Home Assistant friendly names match.
-    - **Conflict Warning**: Actions in different groups can trigger simultaneously. It is recommended to use only one group type per mode to avoid overlapping automations.
-    [Full Documentation](https://github.com/SirGoodenough/HA_Blueprints)
+  description: |
+    Control your smart home with the Aqara Magic Cube T1 Pro via Zigbee2MQTT.
+    
+    **Features:**
+    - 58+ unique commands (118+ total with modes)
+    - Two operation modes: Action Mode and Scene Mode
+    - Four action groups for flexible automation organization
+    
+    **Important Notes:**
+    - MQTT topic must contain only alphanumeric characters (A-Z, a-z, 0-9)
+    - Forward slashes (/) are allowed between device and topic
+    - Ensure Z2M friendly_name matches HA entity name
+    
+    **Action Groups:**
+    - 🎯 Group 1: Side-specific actions (36 action + 18 scene)
+    - 👍 Group 2: Any-side actions (6 action + 3 scene)
+    - 🍊 Group 3: Side-to-side transitions (30 action + 30 scene)
+    - 🍕 Group 4: Mode-specific unique actions (5 total)
+    
+    ⚠️ **Warning:** Groups 1, 2, and 3 can trigger simultaneously. Choose one group per automation to avoid conflicts.
+    
+    [Documentation](https://github.com/SirGoodenough/HA_Blueprints/blob/master/Automations/Zigbee2MQTT%20-%20Xiaomi%20Cube%20Controller%20MQTT%20Triggered.md) | 
+    [Community Discussion](https://community.home-assistant.io/t/zigbee2mqtt-aqara-magic-cube-t1-pro-ctp-r01-xiaomi-lumi-cagl02/525111)
+
   source_url: https://github.com/SirGoodenough/HA_Blueprints/blob/master/Automations/Zigbee2MQTT-Aqara-Magic-Cube-T1-Pro-CTP-R01-Xiaomi-Lumi.yaml
   domain: automation
   homeassistant:
     min_version: 2024.6.0
+
   input:
-    topic:
-      name: "Topic"
-      description: >
-        The main MQTT Topic for your cube.
-        Details on finding the correct topic can be found here:
-        [Find my Cube Topic](https://github.com/SirGoodenough/HA_Blueprints/blob/master/Automations/Zigbee2MQTT-Aqara-Magic-Cube-T1-Pro-CTP-R01-Xiaomi-Lumi.md#to-make-the-blueprint-work-it-will-need)
-      default: "zigbee2mqtt/?"
-      selector:
-        text:
-          multiline: false
-    additional_conditions:
-      name: "Additional conditions"
-      description: |
-        Extra conditions you may want to add to this automation
-        (Example: Home occupied, TV on, etc)
-      default: []
-      selector:
-    required_input:
-      name: "Required input"
-      icon: mdi:alert-box
+    # Required Configuration
+    required_settings:
+      name: "⚙️ Required Settings"
+      icon: mdi:cog-outline
       collapsed: false
-      description: >
-        Ensure the MQTT Topic contains **only** alphanumeric characters (A-Z, 0-9) and single underscores/slashes.
-        Spaces or special characters will cause issues.
-        If you encounter "TemplateError", ensure the Friendly Name in Zigbee2MQTT matches the Entity Name in Home Assistant.
+      description: |
+        **MQTT Topic Requirements:**
+        - Use only alphanumeric characters (A-Z, a-z, 0-9)
+        - No spaces or special characters except forward slash (/)
+        - Example: `zigbee2mqtt/living_room_cube`
+        
+        **Troubleshooting Template Error:**
+        If you see "TemplateError: Must provide a device or entity ID":
+        1. Open Zigbee2MQTT web UI
+        2. Set the friendly_name to match your HA entity
+        3. Enable "Update Home Assistant entity" option
       input:
-    action_side_1_group_1_actions:
-      name: "Action Mode | Side 1 Actions 🔴"
+        mqtt_topic:
+          name: MQTT Topic
+          description: The MQTT topic for your cube (e.g., zigbee2mqtt/cube_name)
+          default: zigbee2mqtt/?
+          selector:
+            text:
+              multiline: false
+
+    # Optional Conditions
+    conditions:
+      name: "🔧 Optional Conditions"
+      icon: mdi:filter-variant
+      collapsed: true
+      description: Add time-based or state-based conditions to control when this automation runs
+      input:
+        extra_conditions:
+          name: Additional Conditions
+          description: Optional conditions (e.g., time of day, home occupancy)
+          default: []
+          selector:
+            condition:
+
+    # Action Mode - Group 1 (Side-Specific)
+    action_g1_side1:
+      name: "🫳 Action Mode - Side 1 (Aqara Logo) - Group 1 🎯"
       icon: mdi:numeric-1-box
       collapsed: true
-      description: >
-        🔴 Group 1: Actions ending on Face 1.
-        (the one with the 'Aqara' LOGO) of the cube up to start.
+      description: Side-specific actions for Face 1 (Aqara logo side)
       input:
-        action_slide_face_1:
-          name: "Action Mode | Face 1: Slide 🔴"
-          description: Face 1 is the one with the 'Aqara' LOGO
+        act_s1_slide:
+          name: Slide (Face 1)
           default: []
           selector:
             action: {}
-        action_doubletap_face_1:
-          name: "Action Mode | Face 1: Double tap 🔴"
-          description: Face 1 is the one with the 'Aqara' LOGO
+        act_s1_doubletap:
+          name: Double Tap (Face 1)
           default: []
           selector:
             action: {}
-        action_flipped90_face_1:
-          name: "Action Mode | Face 1: Flip 90 degrees 🔴"
-          description: Face 1 is the one with the 'Aqara' LOGO
+        act_s1_flip90:
+          name: Flip 90° to Face 1
           default: []
           selector:
             action: {}
-        action_flipped180_face_1:
-          name: "Action Mode | Face 1: Flip 180 degrees 🔴"
-          description: >
-            "**NOTE:** This action is trick to master, and should be used sparingly...
-            Face 1 is the one with the 'Aqara' LOGO"
+        act_s1_flip180:
+          name: Flip 180° to Face 1
+          description: "⚠️ Advanced gesture - use sparingly"
           default: []
           selector:
             action: {}
-        action_flip_from_any_to_face_1:
-          name: "Action Mode | Face 1: Flip from Any 🔴"
-          description: Face 1 is the one with the 'Aqara' LOGO
+        act_s1_flip_any:
+          name: Flip from Any to Face 1
           default: []
           selector:
             action: {}
-        action_rotate_cw_face_1:
-          name: "Action Mode | Face 1: Rotate CW 🔴"
-          description: Face 1 is the one with the 'Aqara' LOGO
+        act_s1_rotate_cw:
+          name: Rotate Clockwise (Face 1)
           default: []
           selector:
             action: {}
-        action_rotate_ccw_face_1:
-          name: "Action Mode | Face 1: Rotate CCW 🔴"
-          description: Face 1 is the one with the 'Aqara' LOGO
+        act_s1_rotate_ccw:
+          name: Rotate Counter-Clockwise (Face 1)
           default: []
           selector:
             action: {}
-    action_side_2_group_1_actions:
-      name: "Action Mode | Side 2 Actions 🔴"
+
+    action_g1_side2:
+      name: "🫳 Action Mode - Side 2 - Group 1 🎯"
       icon: mdi:numeric-2-box
       collapsed: true
-      description: >
-        🔴 Group 1: Actions ending on Face 2.
       input:
-        action_slide_face_2:
-          name: "Action Mode | Face 2: Slide 🔴"
+        act_s2_slide:
+          name: Slide (Face 2)
           default: []
           selector:
             action: {}
-        action_doubletap_face_2:
-          name: "Action Mode | Face 2: Double tap 🔴"
+        act_s2_doubletap:
+          name: Double Tap (Face 2)
           default: []
           selector:
             action: {}
-        action_flipped90_face_2:
-          name: "Action Mode | Face 2: Flip 90 degrees 🔴"
+        act_s2_flip90:
+          name: Flip 90° to Face 2
           default: []
           selector:
             action: {}
-        action_flipped180_face_2:
-          name: "Action Mode | Face 2: Flip 180 degrees 🔴"
-          description: "**NOTE:** This action is trick to master, and should be used sparingly..."
+        act_s2_flip180:
+          name: Flip 180° to Face 2
+          description: "⚠️ Advanced gesture - use sparingly"
           default: []
           selector:
             action: {}
-        action_flip_from_any_to_face_2:
-          name: "Action Mode | Face 2: Flip from Any 🔴"
+        act_s2_flip_any:
+          name: Flip from Any to Face 2
           default: []
           selector:
             action: {}
-        action_rotate_cw_face_2:
-          name: "Action Mode | Face 2: Rotate CW 🔴"
+        act_s2_rotate_cw:
+          name: Rotate Clockwise (Face 2)
           default: []
           selector:
             action: {}
-        action_rotate_ccw_face_2:
-          name: "Action Mode | Face 2: Rotate CCW 🔴"
+        act_s2_rotate_ccw:
+          name: Rotate Counter-Clockwise (Face 2)
           default: []
           selector:
             action: {}
-    action_side_3_group_1_actions:
-      name: "Action Mode | Side 3 Actions 🔴"
+
+    action_g1_side3:
+      name: "🫳 Action Mode - Side 3 - Group 1 🎯"
       icon: mdi:numeric-3-box
       collapsed: true
-      description: >
-        🔴 Group 1: Actions ending on Face 3.
       input:
-        action_slide_face_3:
-          name: "Action Mode | Face 3: Slide 🔴"
+        act_s3_slide:
+          name: Slide (Face 3)
           default: []
           selector:
             action: {}
-        action_doubletap_face_3:
-          name: "Action Mode | Face 3: Double tap 🔴"
+        act_s3_doubletap:
+          name: Double Tap (Face 3)
           default: []
           selector:
             action: {}
-        action_flipped90_face_3:
-          name: "Action Mode | Face 3: Flip 90 degrees 🔴"
+        act_s3_flip90:
+          name: Flip 90° to Face 3
           default: []
           selector:
             action: {}
-        action_flipped180_face_3:
-          name: "Action Mode | Face 3: Flip 180 degrees 🔴"
-          description: "**NOTE:** This action is trick to master, and should be used sparingly..."
+        act_s3_flip180:
+          name: Flip 180° to Face 3
+          description: "⚠️ Advanced gesture - use sparingly"
           default: []
           selector:
             action: {}
-        action_flip_from_any_to_face_3:
-          name: "Action Mode | Face 3: Flip from Any 🔴"
+        act_s3_flip_any:
+          name: Flip from Any to Face 3
           default: []
           selector:
             action: {}
-        action_rotate_cw_face_3:
-          name: "Action Mode | Face 3: Rotate CW 🔴"
+        act_s3_rotate_cw:
+          name: Rotate Clockwise (Face 3)
           default: []
           selector:
             action: {}
-        action_rotate_ccw_face_3:
-          name: "Action Mode | Face 3: Rotate CCW 🔴"
+        act_s3_rotate_ccw:
+          name: Rotate Counter-Clockwise (Face 3)
           default: []
           selector:
             action: {}
-    action_side_4_group_1_actions:
-      name: "Action Mode | Side 4 Actions 🔴"
+
+    action_g1_side4:
+      name: "🫳 Action Mode - Side 4 - Group 1 🎯"
       icon: mdi:numeric-4-box
       collapsed: true
-      description: >
-        🔴 Group 1: Actions ending on Face 4.
       input:
-        action_slide_face_4:
-          name: "Action Mode | Face 4: Slide 🔴"
+        act_s4_slide:
+          name: Slide (Face 4)
           default: []
           selector:
             action: {}
-        action_doubletap_face_4:
-          name: "Action Mode | Face 4: Double tap 🔴"
+        act_s4_doubletap:
+          name: Double Tap (Face 4)
           default: []
           selector:
             action: {}
-        action_flipped90_face_4:
-          name: "Action Mode | Face 4: Flip 90 degrees 🔴"
+        act_s4_flip90:
+          name: Flip 90° to Face 4
           default: []
           selector:
             action: {}
-        action_flipped180_face_4:
-          name: "Action Mode | Face 4: Flip 180 degrees 🔴"
-          description: "**NOTE:** This action is trick to master, and should be used sparingly..."
+        act_s4_flip180:
+          name: Flip 180° to Face 4
+          description: "⚠️ Advanced gesture - use sparingly"
           default: []
           selector:
             action: {}
-        action_flip_from_any_to_face_4:
-          name: "Action Mode | Face 4: Flip from Any 🔴"
+        act_s4_flip_any:
+          name: Flip from Any to Face 4
           default: []
           selector:
             action: {}
-        action_rotate_cw_face_4:
-          name: "Action Mode | Face 4: Rotate CW 🔴"
+        act_s4_rotate_cw:
+          name: Rotate Clockwise (Face 4)
           default: []
           selector:
             action: {}
-        action_rotate_ccw_face_4:
-          name: "Action Mode | Face 4: Rotate CCW 🔴"
+        act_s4_rotate_ccw:
+          name: Rotate Counter-Clockwise (Face 4)
           default: []
           selector:
             action: {}
-    action_side_5_group_1_actions:
-      name: "Action Mode | Side 5 Actions 🔴"
+
+    action_g1_side5:
+      name: "🫳 Action Mode - Side 5 - Group 1 🎯"
       icon: mdi:numeric-5-box
       collapsed: true
-      description: >
-        🔴 Group 1: Actions ending on Face 5.
       input:
-        action_slide_face_5:
-          name: "Action Mode | Face 5: Slide 🔴"
+        act_s5_slide:
+          name: Slide (Face 5)
           default: []
           selector:
             action: {}
-        action_doubletap_face_5:
-          name: "Action Mode | Face 5: Double tap 🔴"
+        act_s5_doubletap:
+          name: Double Tap (Face 5)
           default: []
           selector:
             action: {}
-        action_flipped90_face_5:
-          name: "Action Mode | Face 5: Flip 90 degrees 🔴"
+        act_s5_flip90:
+          name: Flip 90° to Face 5
           default: []
           selector:
             action: {}
-        action_flipped180_face_5:
-          name: "Action Mode | Face 5: Flip 180 degrees 🔴"
-          description: "**NOTE:** This action is trick to master, and should be used sparingly..."
+        act_s5_flip180:
+          name: Flip 180° to Face 5
+          description: "⚠️ Advanced gesture - use sparingly"
           default: []
           selector:
             action: {}
-        action_flip_from_any_to_face_5:
-          name: "Action Mode | Face 5: Flip from Any 🔴"
+        act_s5_flip_any:
+          name: Flip from Any to Face 5
           default: []
           selector:
             action: {}
-        action_rotate_cw_face_5:
-          name: "Action Mode | Face 5: Rotate CW 🔴"
+        act_s5_rotate_cw:
+          name: Rotate Clockwise (Face 5)
           default: []
           selector:
             action: {}
-        action_rotate_ccw_face_5:
-          name: "Action Mode | Face 5: Rotate CCW 🔴"
+        act_s5_rotate_ccw:
+          name: Rotate Counter-Clockwise (Face 5)
           default: []
           selector:
             action: {}
-    action_side_6_group_1_actions:
-      name: "Action Mode | Side 6 Actions 🔴"
+
+    action_g1_side6:
+      name: "🫳 Action Mode - Side 6 - Group 1 🎯"
       icon: mdi:numeric-6-box
       collapsed: true
-      description: >
-        🔴 Group 1: Actions ending on Face 6.
       input:
-        action_slide_face_6:
-          name: "Action Mode | Face 6: Slide 🔴"
+        act_s6_slide:
+          name: Slide (Face 6)
           default: []
           selector:
             action: {}
-        action_doubletap_face_6:
-          name: "Action Mode | Face 6: Double tap 🔴"
+        act_s6_doubletap:
+          name: Double Tap (Face 6)
           default: []
           selector:
             action: {}
-        action_flipped90_face_6:
-          name: "Action Mode | Face 6: Flip 90 degrees 🔴"
+        act_s6_flip90:
+          name: Flip 90° to Face 6
           default: []
           selector:
             action: {}
-        action_flipped180_face_6:
-          name: "Action Mode | Face 6: Flip 180 degrees 🔴"
-          description: "**NOTE:** This action is trick to master, and should be used sparingly..."
+        act_s6_flip180:
+          name: Flip 180° to Face 6
+          description: "⚠️ Advanced gesture - use sparingly"
           default: []
           selector:
             action: {}
-        action_flip_from_any_to_face_6:
-          name: "Action Mode | Face 6: Flip from Any 🔴"
+        act_s6_flip_any:
+          name: Flip from Any to Face 6
           default: []
           selector:
             action: {}
-        action_rotate_cw_face_6:
-          name: "Action Mode | Face 6: Rotate CW 🔴"
+        act_s6_rotate_cw:
+          name: Rotate Clockwise (Face 6)
           default: []
           selector:
             action: {}
-        action_rotate_ccw_face_6:
-          name: "Action Mode | Face 6: Rotate CCW 🔴"
+        act_s6_rotate_ccw:
+          name: Rotate Counter-Clockwise (Face 6)
           default: []
           selector:
             action: {}
-    action_any_side_group_2_actions:
-      name: "Action Mode | Any Side Actions 🟣"
-      icon: mdi:fruit-cherries
+
+    # Action Mode - Group 2 (Any Side)
+    action_g2_any:
+      name: "🫳 Action Mode - Any Side - Group 2 👍"
+      icon: mdi:cube-outline
       collapsed: true
-      description: >
-        🟣 These are a set of 6 event functions that will trigger on specific actions
-        on *ANY* side. **Group 2 actions 🟣**
+      description: |
+        ⚠️ **Warning:** These actions also trigger Group 1 and Group 3 actions.
+        Use only one group type per automation to avoid conflicts.
       input:
-        action_slide_any:
-          name: "Action Mode | Any Side: Slide on any side 🟣"
-          description: >
-            Side doesn't matter on this one.
-            🟠 WARNING: Overlaps with Side-specific (🔴) and Flip (🟢) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_any_slide:
+          name: Slide (Any Side)
           default: []
           selector:
             action: {}
-        action_doubletap_any:
-          name: "Action Mode | Any Side: Double tap on any side 🟣"
-          description: >
-            Side doesn't matter on this one.
-            🟠 WARNING: Overlaps with Side-specific (🔴) and Flip (🟢) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_any_doubletap:
+          name: Double Tap (Any Side)
           default: []
           selector:
             action: {}
-        action_flipped90_any:
-          name: "Action Mode | Any Side: Flip 90 degrees to any side 🟣"
-          description: >
-            Side doesn't matter on this one.
-            🟠 WARNING: Overlaps with Side-specific (🔴) and Flip (🟢) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_any_flip90:
+          name: Flip 90° (Any Side)
           default: []
           selector:
             action: {}
-        action_flipped180_any:
-          name: "Action Mode | Any Side: Flip 180 degrees to any side 🟣"
-          description: >
-            NOTE: This action is trick to master, and should be used sparingly...
-            Side doesn't matter on this one.
-            🟠 WARNING: Overlaps with other action groups.
-            🔵 NOTE: Use only one group to avoid duplicate triggers.
+        act_any_flip180:
+          name: Flip 180° (Any Side)
+          description: "⚠️ Advanced gesture - use sparingly"
           default: []
           selector:
             action: {}
-        action_rotate_cw_any:
-          name: "Action Mode | Any Side: Rotate CW on any side 🟣"
-          description: >
-            Side doesn't matter on this one.
-            🟠 WARNING: Overlaps with Side-specific (🔴) and Flip (🟢) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_any_rotate_cw:
+          name: Rotate Clockwise (Any Side)
           default: []
           selector:
             action: {}
-        action_rotate_ccw_any:
-          name: "Action Mode | Any Side: Rotate CCW on any side 🟣"
-          description: >
-            Side doesn't matter on this one.
-            🟠 WARNING: Overlaps with Side-specific (🔴) and Flip (🟢) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_any_rotate_ccw:
+          name: Rotate Counter-Clockwise (Any Side)
           default: []
           selector:
             action: {}
-    action_side_1_group_3_actions:
-      name: "Action Mode | Side 1 Flips 🟢"
+
+    # Action Mode - Group 3 (Side Transitions)
+    action_g3_to_side1:
+      name: "🫳 Action Mode - Flip to Side 1 - Group 3 🍊"
       icon: mdi:numeric-1-circle
       collapsed: true
-      description: >
-        🟢 Group 3: Flips to Face 1.
+      description: |
+        ⚠️ **Warning:** Also triggers Group 1 flip actions and Group 2 any-side actions.
       input:
-        action_1_from_6:
-          name: "Action Mode | Face 1: Flip from Side 6 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 180 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_1from2:
+          name: Flip to Side 1 from Side 2
           default: []
           selector:
             action: {}
-        action_1_from_2:
-          name: "Action Mode | Face 1: Flip from Side 2 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_1from3:
+          name: Flip to Side 1 from Side 3
           default: []
           selector:
             action: {}
-        action_1_from_3:
-          name: "Action Mode | Face 1: Flip from Side 3 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_1from4:
+          name: Flip to Side 1 from Side 4
           default: []
           selector:
             action: {}
-        action_1_from_4:
-          name: "Action Mode | Face 1: Flip from Side 4 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_1from5:
+          name: Flip to Side 1 from Side 5
           default: []
           selector:
             action: {}
-        action_1_from_5:
-          name: "Action Mode | Face 1: Flip from Side 5 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_1from6:
+          name: Flip to Side 1 from Side 6
           default: []
           selector:
             action: {}
-    action_side_2_group_3_actions:
-      name: "Action Mode | Side 2 Flips 🟢"
+
+    action_g3_to_side2:
+      name: "🫳 Action Mode - Flip to Side 2 - Group 3 🍊"
       icon: mdi:numeric-2-circle
       collapsed: true
-      description: >
-        🟢 Group 3: Flips to Face 2.
       input:
-        action_2_from_1:
-          name: "Action Mode | Face 2: Flip from Side 1 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_2from1:
+          name: Flip to Side 2 from Side 1
           default: []
           selector:
             action: {}
-        action_2_from_3:
-          name: "Action Mode | Face 2: Flip from Side 3 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_2from3:
+          name: Flip to Side 2 from Side 3
           default: []
           selector:
             action: {}
-        action_2_from_4:
-          name: "Action Mode | Face 2: Flip from Side 4 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_2from4:
+          name: Flip to Side 2 from Side 4
           default: []
           selector:
             action: {}
-        action_2_from_5:
-          name: "Action Mode | Face 2: Flip from Side 5 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 180 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_2from5:
+          name: Flip to Side 2 from Side 5
           default: []
           selector:
             action: {}
-        action_2_from_6:
-          name: "Action Mode | Face 2: Flip from Side 6 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_2from6:
+          name: Flip to Side 2 from Side 6
           default: []
           selector:
             action: {}
-    action_side_3_group_3_actions:
-      name: "Action Mode | Side 3 Flips 🟢"
+
+    action_g3_to_side3:
+      name: "🫳 Action Mode - Flip to Side 3 - Group 3 🍊"
       icon: mdi:numeric-3-circle
       collapsed: true
-      description: >
-        🟢 Group 3: Flips to Face 3.
       input:
-        action_3_from_1:
-          name: "Action Mode | Face 3: Flip from Side 1 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_3from1:
+          name: Flip to Side 3 from Side 1
           default: []
           selector:
             action: {}
-        action_3_from_2:
-          name: "Action Mode | Face 3: Flip from Side 2 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_3from2:
+          name: Flip to Side 3 from Side 2
           default: []
           selector:
             action: {}
-        action_3_from_4:
-          name: "Action Mode | Face 3: Flip from Side 4 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 180 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_3from4:
+          name: Flip to Side 3 from Side 4
           default: []
           selector:
             action: {}
-        action_3_from_5:
-          name: "Action Mode | Face 3: Flip from Side 5 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_3from5:
+          name: Flip to Side 3 from Side 5
           default: []
           selector:
             action: {}
-        action_3_from_6:
-          name: "Action Mode | Face 3: Flip from Side 6 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_3from6:
+          name: Flip to Side 3 from Side 6
           default: []
           selector:
             action: {}
-    action_side_4_group_3_actions:
-      name: "Action Mode | Side 4 Flips 🟢"
+
+    action_g3_to_side4:
+      name: "🫳 Action Mode - Flip to Side 4 - Group 3 🍊"
       icon: mdi:numeric-4-circle
       collapsed: true
-      description: >
-        🟢 Group 3: Flips to Face 4.
       input:
-        action_4_from_1:
-          name: "Action Mode | Face 4: Flip from Side 1 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_4from1:
+          name: Flip to Side 4 from Side 1
           default: []
           selector:
             action: {}
-        action_4_from_2:
-          name: "Action Mode | Face 4: Flip from Side 2 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_4from2:
+          name: Flip to Side 4 from Side 2
           default: []
           selector:
             action: {}
-        action_4_from_3:
-          name: "Action Mode | Face 4: Flip from Side 3 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 180 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_4from3:
+          name: Flip to Side 4 from Side 3
           default: []
           selector:
             action: {}
-        action_4_from_5:
-          name: "Action Mode | Face 4: Flip from Side 5 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_4from5:
+          name: Flip to Side 4 from Side 5
           default: []
           selector:
             action: {}
-        action_4_from_6:
-          name: "Action Mode | Face 4: Flip from Side 6 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_4from6:
+          name: Flip to Side 4 from Side 6
           default: []
           selector:
             action: {}
-    action_side_5_group_3_actions:
-      name: "Action Mode | Side 5 Flips 🟢"
+
+    action_g3_to_side5:
+      name: "🫳 Action Mode - Flip to Side 5 - Group 3 🍊"
       icon: mdi:numeric-5-circle
       collapsed: true
-      description: >
-        🟢 Group 3: Flips to Face 5.
       input:
-        action_5_from_1:
-          name: "Action Mode | Face 5: Flip from Side 1 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_5from1:
+          name: Flip to Side 5 from Side 1
           default: []
           selector:
             action: {}
-        action_5_from_2:
-          name: "Action Mode | Face 5: Flip from Side 2 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 180 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_5from2:
+          name: Flip to Side 5 from Side 2
           default: []
           selector:
             action: {}
-        action_5_from_3:
-          name: "Action Mode | Face 5: Flip from Side 3 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_5from3:
+          name: Flip to Side 5 from Side 3
           default: []
           selector:
             action: {}
-        action_5_from_4:
-          name: "Action Mode | Face 5: Flip from Side 4 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_5from4:
+          name: Flip to Side 5 from Side 4
           default: []
           selector:
             action: {}
-        action_5_from_6:
-          name: "Action Mode | Face 5: Flip from Side 6 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_5from6:
+          name: Flip to Side 5 from Side 6
           default: []
           selector:
             action: {}
-    action_side_6_group_3_actions:
-      name: "Action Mode | Side 6 Flips 🟢"
+
+    action_g3_to_side6:
+      name: "🫳 Action Mode - Flip to Side 6 - Group 3 🍊"
       icon: mdi:numeric-6-circle
       collapsed: true
-      description: >
-        🟢 Group 3: Flips to Face 6.
       input:
-        action_6_from_1:
-          name: "Action Mode | Face 6: Flip from Side 1 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 180 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_6from1:
+          name: Flip to Side 6 from Side 1
           default: []
           selector:
             action: {}
-        action_6_from_2:
-          name: "Action Mode | Face 6: Flip from Side 2 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_6from2:
+          name: Flip to Side 6 from Side 2
           default: []
           selector:
             action: {}
-        action_6_from_3:
-          name: "Action Mode | Face 6: Flip from Side 3 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_6from3:
+          name: Flip to Side 6 from Side 3
           default: []
           selector:
             action: {}
-        action_6_from_4:
-          name: "Action Mode | Face 6: Flip from Side 4 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_6from4:
+          name: Flip to Side 6 from Side 4
           default: []
           selector:
             action: {}
-        action_6_from_5:
-          name: "Action Mode | Face 6: Flip from Side 5 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        act_6from5:
+          name: Flip to Side 6 from Side 5
           default: []
           selector:
             action: {}
-    group_4_actions:
-      name: "Group 4 actions only used once (no side) 🟡"
-      icon: mdi:pizza
+
+    # Action Mode - Group 4 (Unique Actions)
+    action_g4_unique:
+      name: "🫳 Action Mode - Unique Actions - Group 4 🍕"
+      icon: mdi:gesture
       collapsed: true
-      description: >
-        These are Group 4 actions only used once (no side) 🟡
-        they can be safely compined with any other action mode command.
+      description: These actions can be safely combined with any other group
       input:
-        action_shake:
-          name: "Action Mode | Shake the cube 🟡 Group 4"
-          description: >
-            This trigger only occurs once in the set-up.
-            It can be combined in any group.
+        act_shake:
+          name: Shake Cube
           default: []
           selector:
             action: {}
-        action_throw:
-          name: "Action Mode | Throw the cube 🟡 Group 4"
-          description: >
-            You don't actually 'Throw' the cube. The action is as follows:
-            > Pick up the cube firmly.
-            > Make a throwing motion with it but do not motion back towards yourself.
-            > Hold it there for a second.
-            > The throw trigger should be sent to Z2M.
-            This trigger only occurs once in the set-up.
-            It can be combined in any group.
+        act_throw:
+          name: Throw Gesture
+          description: |
+            Pick up cube → make throwing motion forward → hold → trigger fires
+            (Don't actually throw the cube!)
           default: []
           selector:
             action: {}
-    scene_side_1_group_1_actions:
-      name: "Scene Mode | Side 1 Actions 🔴"
+
+    # Scene Mode - Group 1 (Side-Specific)
+    scene_g1_side1:
+      name: "👀 Scene Mode - Side 1 (Aqara Logo) - Group 1 🎯"
       icon: mdi:numeric-1-box
       collapsed: true
-      description: >
-        🔴 Group 1: Actions ending on Face 1.
-        (the one with the 'Aqara' LOGO) of the cube up to start.
       input:
-        scene_flip_to_face_1:
-          name: "Scene Mode | Face 1: Flip from Any 🔴"
-          description: Face 1 is the one with the 'Aqara' LOGO
+        scn_s1_flip:
+          name: Flip to Face 1 (Any Origin)
           default: []
           selector:
             action: {}
-        scene_rotate_cw_face_1:
-          name: "Scene Mode | Face 1: Rotate cube CW 🔴"
-          description: Face 1 is the one with the 'Aqara' LOGO
+        scn_s1_rotate_cw:
+          name: Rotate Clockwise (Face 1)
           default: []
           selector:
             action: {}
-        scene_rotate_ccw_face_1:
-          name: "Scene Mode | Face 1: Rotate cube CCW 🔴"
-          description: Face 1 is the one with the 'Aqara' LOGO
+        scn_s1_rotate_ccw:
+          name: Rotate Counter-Clockwise (Face 1)
           default: []
           selector:
             action: {}
-    scene_side_2_group_1_actions:
-      name: "Scene Mode | Side 2 Actions 🔴"
+
+    scene_g1_side2:
+      name: "👀 Scene Mode - Side 2 - Group 1 🎯"
       icon: mdi:numeric-2-box
       collapsed: true
-      description: >
-        🔴 Group 1: Actions ending on Face 2.
       input:
-        scene_flip_to_face_2:
-          name: "Scene Mode | Face 2: Flip from Any 🔴"
+        scn_s2_flip:
+          name: Flip to Face 2 (Any Origin)
           default: []
           selector:
             action: {}
-        scene_rotate_cw_face_2:
-          name: "Scene Mode | Face 2: Rotate cube CW 🔴"
+        scn_s2_rotate_cw:
+          name: Rotate Clockwise (Face 2)
           default: []
           selector:
             action: {}
-        scene_rotate_ccw_face_2:
-          name: "Scene Mode | Face 2: Rotate cube CCW 🔴"
+        scn_s2_rotate_ccw:
+          name: Rotate Counter-Clockwise (Face 2)
           default: []
           selector:
             action: {}
-    scene_side_3_group_1_actions:
-      name: "Scene Mode | Side 3 Actions 🔴"
+
+    scene_g1_side3:
+      name: "👀 Scene Mode - Side 3 - Group 1 🎯"
       icon: mdi:numeric-3-box
       collapsed: true
-      description: >
-        🔴 Group 1: Actions ending on Face 3.
       input:
-        scene_flip_to_face_3:
-          name: "Scene Mode | Face 3: Flip from Any 🔴"
+        scn_s3_flip:
+          name: Flip to Face 3 (Any Origin)
           default: []
           selector:
             action: {}
-        scene_rotate_cw_face_3:
-          name: "Scene Mode | Face 3: Rotate cube CW 🔴"
+        scn_s3_rotate_cw:
+          name: Rotate Clockwise (Face 3)
           default: []
           selector:
             action: {}
-        scene_rotate_ccw_face_3:
-          name: "Scene Mode | Face 3: Rotate cube CCW 🔴"
+        scn_s3_rotate_ccw:
+          name: Rotate Counter-Clockwise (Face 3)
           default: []
           selector:
             action: {}
-    scene_side_4_group_1_actions:
-      name: "Scene Mode | Side 4 Actions 🔴"
+
+    scene_g1_side4:
+      name: "👀 Scene Mode - Side 4 - Group 1 🎯"
       icon: mdi:numeric-4-box
       collapsed: true
-      description: >
-        🔴 Group 1: Actions ending on Face 4.
       input:
-        scene_flip_to_face_4:
-          name: "Scene Mode | Face 4: Flip from Any 🔴"
+        scn_s4_flip:
+          name: Flip to Face 4 (Any Origin)
           default: []
           selector:
             action: {}
-        scene_rotate_cw_face_4:
-          name: "Scene Mode | Face 4: Rotate cube CW 🔴"
+        scn_s4_rotate_cw:
+          name: Rotate Clockwise (Face 4)
           default: []
           selector:
             action: {}
-        scene_rotate_ccw_face_4:
-          name: "Scene Mode | Face 4: Rotate cube CCW 🔴"
+        scn_s4_rotate_ccw:
+          name: Rotate Counter-Clockwise (Face 4)
           default: []
           selector:
             action: {}
-    scene_side_5_group_1_actions:
-      name: "Scene Mode | Side 5 Actions 🔴"
+
+    scene_g1_side5:
+      name: "👀 Scene Mode - Side 5 - Group 1 🎯"
       icon: mdi:numeric-5-box
       collapsed: true
-      description: >
-        🔴 Group 1: Actions ending on Face 5.
       input:
-        scene_flip_to_face_5:
-          name: "Scene Mode | Face 5: Flip from Any 🔴"
+        scn_s5_flip:
+          name: Flip to Face 5 (Any Origin)
           default: []
           selector:
             action: {}
-        scene_rotate_cw_face_5:
-          name: "Scene Mode | Face 5: Rotate cube CW 🔴"
+        scn_s5_rotate_cw:
+          name: Rotate Clockwise (Face 5)
           default: []
           selector:
             action: {}
-        scene_rotate_ccw_face_5:
-          name: "Scene Mode | Face 5: Rotate cube CCW 🔴"
+        scn_s5_rotate_ccw:
+          name: Rotate Counter-Clockwise (Face 5)
           default: []
           selector:
             action: {}
-    scene_side_6_group_1_actions:
-      name: "Scene Mode | Side 6 Actions 🔴"
+
+    scene_g1_side6:
+      name: "👀 Scene Mode - Side 6 - Group 1 🎯"
       icon: mdi:numeric-6-box
       collapsed: true
-      description: >
-        🔴 Group 1: Actions ending on Face 6.
       input:
-        scene_flip_to_face_6:
-          name: "Scene Mode | Face 6: Flip from Any 🔴"
+        scn_s6_flip:
+          name: Flip to Face 6 (Any Origin)
           default: []
           selector:
             action: {}
-        scene_rotate_cw_face_6:
-          name: "Scene Mode | Face 6: Rotate cube CW 🔴"
+        scn_s6_rotate_cw:
+          name: Rotate Clockwise (Face 6)
           default: []
           selector:
             action: {}
-        scene_rotate_ccw_face_6:
-          name: "Scene Mode | Face 6: Rotate cube CCW 🔴"
+        scn_s6_rotate_ccw:
+          name: Rotate Counter-Clockwise (Face 6)
           default: []
           selector:
             action: {}
-    scene_any_side_group_2_actions:
-      name: "Scene Mode | Any Side Actions 🟣"
-      icon: mdi:fruit-cherries
+
+    # Scene Mode - Group 2 (Any Side)
+    scene_g2_any:
+      name: "👀 Scene Mode - Any Side - Group 2 👍"
+      icon: mdi:cube-outline
       collapsed: true
-      description: >
-        🟣 These are a set of 6 event functions that will trigger on specific actions
-        on *ANY* side. **Group 2 actions 🟣**
+      description: |
+        ⚠️ **Warning:** These actions also trigger Group 1 and Group 3 actions.
       input:
-        scene_flip_to_side_any:
-          name: "Scene Mode | Any Side: Flip to any side 🟣"
-          description: >
-            Side doesn't matter on this one.
-            🟠 WARNING: Overlaps with Side-specific (🔴) and Flip (🟢) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_any_flip:
+          name: Flip to Any Side
           default: []
           selector:
             action: {}
-        scene_rotate_cw_any:
-          name: "Scene Mode | Any Side: Rotate cube CW with any side 🟣"
-          description: >
-            Side doesn't matter on this one.
-            🟠 WARNING: Overlaps with Side-specific (🔴) and Flip (🟢) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_any_rotate_cw:
+          name: Rotate Clockwise (Any Side)
           default: []
           selector:
             action: {}
-        scene_rotate_ccw_any:
-          name: "Scene Mode | Any Side: Rotate cube CCW with any side 🟣"
-          description: >
-            Side doesn't matter on this one.
-            🟠 WARNING: Overlaps with Side-specific (🔴) and Flip (🟢) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_any_rotate_ccw:
+          name: Rotate Counter-Clockwise (Any Side)
           default: []
           selector:
             action: {}
-    scene_side_1_group_3_actions:
-      name: "Scene Mode | Side 1 Flips 🟢"
+
+    # Scene Mode - Group 3 (Side Transitions)
+    scene_g3_to_side1:
+      name: "👀 Scene Mode - Flip to Side 1 - Group 3 🍊"
       icon: mdi:numeric-1-circle
       collapsed: true
-      description: >
-        🟢 Group 3: Flips to Face 1.
       input:
-        scene_1_from_6:
-          name: "Scene Mode | Face 1: Flip from Side 6 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 180 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_1from2:
+          name: Flip to Side 1 from Side 2
           default: []
           selector:
             action: {}
-        scene_1_from_2:
-          name: "Scene Mode | Face 1: Flip from Side 2 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_1from3:
+          name: Flip to Side 1 from Side 3
           default: []
           selector:
             action: {}
-        scene_1_from_3:
-          name: "Scene Mode | Face 1: Flip from Side 3 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_1from4:
+          name: Flip to Side 1 from Side 4
           default: []
           selector:
             action: {}
-        scene_1_from_4:
-          name: "Scene Mode | Face 1: Flip from Side 4 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_1from5:
+          name: Flip to Side 1 from Side 5
           default: []
           selector:
             action: {}
-        scene_1_from_5:
-          name: "Scene Mode | Face 1: Flip from Side 5 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_1from6:
+          name: Flip to Side 1 from Side 6
           default: []
           selector:
             action: {}
-    scene_side_2_group_3_actions:
-      name: "Scene Mode | Side 2 Flips 🟢"
+
+    scene_g3_to_side2:
+      name: "👀 Scene Mode - Flip to Side 2 - Group 3 🍊"
       icon: mdi:numeric-2-circle
       collapsed: true
-      description: >
-        🟢 Group 3: Flips to Face 2.
       input:
-        scene_2_from_1:
-          name: "Scene Mode | Face 2: Flip from Side 1 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_2from1:
+          name: Flip to Side 2 from Side 1
           default: []
           selector:
             action: {}
-        scene_2_from_3:
-          name: "Scene Mode | Face 2: Flip from Side 3 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_2from3:
+          name: Flip to Side 2 from Side 3
           default: []
           selector:
             action: {}
-        scene_2_from_4:
-          name: "Scene Mode | Face 2: Flip from Side 4 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_2from4:
+          name: Flip to Side 2 from Side 4
           default: []
           selector:
             action: {}
-        scene_2_from_5:
-          name: "Scene Mode | Face 2: Flip from Side 5 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 180 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_2from5:
+          name: Flip to Side 2 from Side 5
           default: []
           selector:
             action: {}
-        scene_2_from_6:
-          name: "Scene Mode | Face 2: Flip from Side 6 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_2from6:
+          name: Flip to Side 2 from Side 6
           default: []
           selector:
             action: {}
-    scene_side_3_group_3_actions:
-      name: "Scene Mode | Side 3 Flips 🟢"
+
+    scene_g3_to_side3:
+      name: "👀 Scene Mode - Flip to Side 3 - Group 3 🍊"
       icon: mdi:numeric-3-circle
       collapsed: true
-      description: >
-        🟢 Group 3: Flips to Face 3.
       input:
-        scene_3_from_1:
-          name: "Scene Mode | Face 3: Flip from Side 1 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_3from1:
+          name: Flip to Side 3 from Side 1
           default: []
           selector:
             action: {}
-        scene_3_from_2:
-          name: "Scene Mode | Face 3: Flip from Side 2 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_3from2:
+          name: Flip to Side 3 from Side 2
           default: []
           selector:
             action: {}
-        scene_3_from_4:
-          name: "Scene Mode | Face 3: Flip from Side 4 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 180 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_3from4:
+          name: Flip to Side 3 from Side 4
           default: []
           selector:
             action: {}
-        scene_3_from_5:
-          name: "Scene Mode | Face 3: Flip from Side 5 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_3from5:
+          name: Flip to Side 3 from Side 5
           default: []
           selector:
             action: {}
-        scene_3_from_6:
-          name: "Scene Mode | Face 3: Flip from Side 6 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_3from6:
+          name: Flip to Side 3 from Side 6
           default: []
           selector:
             action: {}
-    scene_side_4_group_3_actions:
-      name: "Scene Mode | Side 4 Flips 🟢"
+
+    scene_g3_to_side4:
+      name: "👀 Scene Mode - Flip to Side 4 - Group 3 🍊"
       icon: mdi:numeric-4-circle
       collapsed: true
-      description: >
-        🟢 Group 3: Flips to Face 4.
       input:
-        scene_4_from_1:
-          name: "Scene Mode | Face 4: Flip from Side 1 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_4from1:
+          name: Flip to Side 4 from Side 1
           default: []
           selector:
             action: {}
-        scene_4_from_2:
-          name: "Scene Mode | Face 4: Flip from Side 2 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_4from2:
+          name: Flip to Side 4 from Side 2
           default: []
           selector:
             action: {}
-        scene_4_from_3:
-          name: "Scene Mode | Face 4: Flip from Side 3 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 180 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_4from3:
+          name: Flip to Side 4 from Side 3
           default: []
           selector:
             action: {}
-        scene_4_from_5:
-          name: "Scene Mode | Face 4: Flip from Side 5 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_4from5:
+          name: Flip to Side 4 from Side 5
           default: []
           selector:
             action: {}
-        scene_4_from_6:
-          name: "Scene Mode | Face 4: Flip from Side 6 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_4from6:
+          name: Flip to Side 4 from Side 6
           default: []
           selector:
             action: {}
-    scene_side_5_group_3_actions:
-      name: "Scene Mode | Side 5 Flips 🟢"
+
+    scene_g3_to_side5:
+      name: "👀 Scene Mode - Flip to Side 5 - Group 3 🍊"
       icon: mdi:numeric-5-circle
       collapsed: true
-      description: >
-        🟢 Group 3: Flips to Face 5.
       input:
-        scene_5_from_1:
-          name: "Scene Mode | Face 5: Flip from Side 1 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_5from1:
+          name: Flip to Side 5 from Side 1
           default: []
           selector:
             action: {}
-        scene_5_from_2:
-          name: "Scene Mode | Face 5: Flip from Side 2 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 180 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_5from2:
+          name: Flip to Side 5 from Side 2
           default: []
           selector:
             action: {}
-        scene_5_from_3:
-          name: "Scene Mode | Face 5: Flip from Side 3 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_5from3:
+          name: Flip to Side 5 from Side 3
           default: []
           selector:
             action: {}
-        scene_5_from_4:
-          name: "Scene Mode | Face 5: Flip from Side 4 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_5from4:
+          name: Flip to Side 5 from Side 4
           default: []
           selector:
             action: {}
-        scene_5_from_6:
-          name: "Scene Mode | Face 5: Flip from Side 6 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_5from6:
+          name: Flip to Side 5 from Side 6
           default: []
           selector:
             action: {}
-    scene_side_6_group_3_actions:
-      name: "Scene Mode | Side 6 Flips 🟢"
+
+    scene_g3_to_side6:
+      name: "👀 Scene Mode - Flip to Side 6 - Group 3 🍊"
       icon: mdi:numeric-6-circle
       collapsed: true
-      description: >
-        🟢 Group 3: Flips to Face 6.
       input:
-        scene_6_from_1:
-          name: "Scene Mode | Face 6: Flip from Side 1 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 180 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_6from1:
+          name: Flip to Side 6 from Side 1
           default: []
           selector:
             action: {}
-        scene_6_from_2:
-          name: "Scene Mode | Face 6: Flip from Side 2 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_6from2:
+          name: Flip to Side 6 from Side 2
           default: []
           selector:
             action: {}
-        scene_6_from_3:
-          name: "Scene Mode | Face 6: Flip from Side 3 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_6from3:
+          name: Flip to Side 6 from Side 3
           default: []
           selector:
             action: {}
-        scene_6_from_4:
-          name: "Scene Mode | Face 6: Flip from Side 4 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_6from4:
+          name: Flip to Side 6 from Side 4
           default: []
           selector:
             action: {}
-        scene_6_from_5:
-          name: "Scene Mode | Face 6: Flip from Side 5 🟢"
-          description: >
-            🟠 WARNING: Overlaps with Flip 90 (🔴) and Any-side (🟣) actions.
-            🔵 NOTE: Avoid using multiple groups simultaneously.
+        scn_6from5:
+          name: Flip to Side 6 from Side 5
           default: []
           selector:
             action: {}
-        scene_group_4_actions:
-          name: "Group 4 actions only used once (no side) 🟡"
-          icon: mdi:pizza
-          collapsed: true
-          description: >
-            These are Group 4 actions only used once (no side) 🟡
-            they can be safely compined with any other scene mode command.
-          input:
-            scene_hold:
-              name: "Scene Mode | Lift up the cube and hold it still 🟡"
-              description: >
-                This trigger only occurs once in the set-up.
-                It can be combined in any group.
-              default: []
-              selector:
-                action: {}
-            scene_shake:
-              name: "Scene Mode | Shake the cube 🟡"
-              description: >
-                This trigger only occurs once in the set-up.
-                It can be combined in any group.
-              default: []
-              selector:
-                action: {}
-            scene_throw:
-              name: "Scene Mode | Throw the cube 🟡"
-              description: >
-                You don't actually 'Throw' the cube. The action is as follows:
-                > Pick up the cube firmly.
-                > Make a throwing motion with it but do not motion back towards yourself.
-                > Hold it there for a second.
-                > The throw trigger should be sent to Z2M.
-                This trigger only occurs once in the set-up.
-                It can be combined in any group.
-              default: []
-              selector:
-                action: {}
+
+    # Scene Mode - Group 4 (Unique Actions)
+    scene_g4_unique:
+      name: "👀 Scene Mode - Unique Actions - Group 4 🍕"
+      icon: mdi:gesture
+      collapsed: true
+      input:
+        scn_hold:
+          name: Hold Cube
+          description: Lift and hold the cube still
+          default: []
+          selector:
+            action: {}
+        scn_shake:
+          name: Shake Cube
+          default: []
+          selector:
+            action: {}
+        scn_throw:
+          name: Throw Gesture
+          description: Pick up → throwing motion → hold (don't actually throw!)
+          default: []
+          selector:
+            action: {}
+
+# Trigger
 trigger:
   - platform: mqtt
-    topic: !input topic
+    topic: !input mqtt_topic
+
+# Variables
 variables:
-  # Get the action command.
-  action: >
-    {% if trigger.payload_json.action is defined %}
-      {{ trigger.payload_json.action }}
-    {% else %}
-      none
-    {% endif %}
-  # Get the angle.
-  angle: >
-    {% if trigger.payload_json.action_angle is number %}
-      {{ trigger.payload_json.action_angle | float(0.0) }}
-    {% else %}
-      0.0
-    {% endif %}
-  # Get the side.
-  side: >
-    {% if trigger.payload_json.side is number %}
-      {{ trigger.payload_json.side | int(0) }}
-    {% else %}
-      0
-    {% endif %}
-  # Get the operation_mode.
-  op_mode: >
-    {% if trigger.payload_json.operation_mode is defined %}
-      {{ trigger.payload_json.operation_mode }}
-    {% else %}
-      none
-    {% endif %}
-  # Get the topic as a variable.
-  topic_var: !input topic
-  # Generate the Friendly_name from the Topic.
-  friendly_name: '{{ topic_var.split(''/'')[1] | regex_replace("[^A-Za-z0-9_/./-]", "") }}'
-  # Generate the device_id from the Friendly_name.
-  device_id: "{{ device_id( friendly_name ) }}"
-  # Pull out the ieee identifier.
-  ieee_id_long: "{{(( device_attr( device_id, 'identifiers') |list)[0][1] )}}"
-  # Generate just the number for the ieee.
-  ieee_id: "{{ieee_id_long.split('_')[1] }}"
-  # Set the name of the Number entity.
-  num_name: "last side"
-  # Set the entity_id of the Number entity.
-  num_ha_name: "{{ 'number.' + friendly_name + '_last_side' }}"
-  # Get the value of this entity from HA
-  num_ha_val: "{{ states(num_ha_name) | default(0) | int(0) }}"
-  # Get the last_side for use in logic below.
-  last_side: >
-    {# The first time it will not be there, so make sure its 0 instead of undefined. #}
-    {% if not num_ha_val in ["undefined", "unknown", "unavailable", "none", "null", ""] %}
-      {{ num_ha_val }}
+  # Parse trigger payload
+  action: >-
+    {{ trigger.payload_json.action | default('none') }}
+  angle: >-
+    {{ trigger.payload_json.action_angle | float(0.0) }}
+  side: >-
+    {{ trigger.payload_json.side | int(0) }}
+  op_mode: >-
+    {{ trigger.payload_json.operation_mode | default('none') }}
+  
+  # Extract device identifiers
+  topic_var: !input mqtt_topic
+  friendly_name: >-
+    {{ topic_var.split('/')[1] | regex_replace('[^A-Za-z0-9_/./-]', '') }}
+  device_id: >-
+    {{ device_id(friendly_name) }}
+  ieee_id: >-
+    {{ (device_attr(device_id, 'identifiers') | list)[0][1].split('_')[1] }}
+  
+  # Number helper entity for last_side tracking
+  num_entity_id: >-
+    {{ 'number.' ~ friendly_name ~ '_last_side' }}
+  last_side: >-
+    {% set val = states(num_entity_id) | default(0) %}
+    {% if val not in ['undefined', 'unknown', 'unavailable', 'none', 'null', ''] %}
+      {{ val | int(0) }}
     {% else %}
       0
     {% endif %}
-  # Set-up for Device parameters once
-  mdl: "Number Helper for Z2M Cube T1-Pro Integration"
-  mf: "SirGoodenough"
-  sa: "house"
-  sw: "2023-12-09"
-  hw: "https://github.com/SirGoodenough/HA_Blueprints/blob/master/Automations/Zigbee2MQTT-Aqara-Magic-Cube-T1-Pro-CTP-R01-Xiaomi-Lumi.yaml"
-  cu: "https://community.home-assistant.io/t/zigbee2mqtt-aqara-magic-cube-t1-pro-ctp-r01-xiaomi-lumi-cagl02/525111"
-  # Set Topics once
-  config_topic_2: "{{ 'homeassistant/number/' + ieee_id + '/last_side/config' }}"
-  topic_2: "{{ 'homeassistant/number/' + ieee_id + '/last_side' }}"
+  
+  # MQTT configuration topics
+  config_topic: >-
+    homeassistant/number/{{ ieee_id }}/last_side/config
+  state_topic: >-
+    homeassistant/number/{{ ieee_id }}/last_side
+
+# Conditions
 condition:
   - condition: or
     conditions:
       - condition: template
-        alias: Check for valid Action Mode triggers
-        value_template: >
-          {{ trigger.payload_json is defined and
-          trigger.payload_json.operation_mode is defined and
-          trigger.payload_json.action is defined and
-          trigger.payload_json.operation_mode == "action_mode" and
-          trigger.payload_json.action in ["rotate_right", "rotate_left",
-          "flip90", "flip180", "slide", "tap", "shake", "throw"] }}
+        alias: Valid Action Mode trigger
+        value_template: >-
+          {{ trigger.payload_json is defined
+             and trigger.payload_json.operation_mode == 'action_mode'
+             and trigger.payload_json.action in 
+                 ['rotate_right', 'rotate_left', 'flip90', 'flip180', 
+                  'slide', 'tap', 'shake', 'throw'] }}
       - condition: template
-        alias: Check for valid Scene Mode triggers
-        value_template: >
-          {{ trigger.payload_json is defined and
-          trigger.payload_json.operation_mode is defined and
-          trigger.payload_json.action is defined and
-          trigger.payload_json.operation_mode == "scene_mode" and
-          trigger.payload_json.action in ["rotate_right", "rotate_left",
-          "flip_to_side", "shake", "throw", "hold"] }}
-  - alias: User pick
-    condition: !input additional_conditions
+        alias: Valid Scene Mode trigger
+        value_template: >-
+          {{ trigger.payload_json is defined
+             and trigger.payload_json.operation_mode == 'scene_mode'
+             and trigger.payload_json.action in 
+                 ['rotate_right', 'rotate_left', 'flip_to_side', 
+                  'shake', 'throw', 'hold'] }}
+  - condition: !input extra_conditions
+
+# Actions
 action:
-  - alias: Make number helper to store last side
+  # Create/update number helper via MQTT discovery
+  - alias: Configure last_side number helper
     service: mqtt.publish
     data:
-      "topic": "{{ config_topic_2 }}"
-      "retain": true
-      "payload": >
-        { "name": "{{ num_name }}",
+      topic: "{{ config_topic }}"
+      retain: true
+      payload: >-
+        {
+          "name": "last side",
           "avty_t": "homeassistant/status",
-          "uniq_id": "{{ friendly_name + '-' + device_id }}",
-          "cmd_t": "{{ topic_2 }}",
-          "sta_t": "{{ topic_2 }}",
-          "min": "0",
-          "max": "6",
-          "step": "1",
+          "uniq_id": "{{ friendly_name }}-{{ device_id }}",
+          "cmd_t": "{{ state_topic }}",
+          "sta_t": "{{ state_topic }}",
+          "min": 0,
+          "max": 6,
+          "step": 1,
           "mode": "box",
           "ret": true,
           "dev": {
-          "name": "{{ friendly_name }}",
-          "mdl": "{{ mdl }}",
-          "mf": "{{ mf }}",
-          "sa": "{{ sa }}",
-          "sw": "{{ sw }}",
-          "hw": "{{ hw }}",
-          "cu": "{{ cu }}",
-          "ids": [
-            "{{ ieee_id + '-' + num_name }}"
-          ]
+            "name": "{{ friendly_name }}",
+            "mdl": "Aqara Magic Cube T1 Pro Controller",
+            "mf": "SirGoodenough",
+            "sw": "2024-06-04",
+            "hw": "https://github.com/SirGoodenough/HA_Blueprints",
+            "ids": ["{{ ieee_id }}-last_side"]
           }
         }
-  - alias: "Fire Last Action event. This is for optional troubleshooting data."
+
+  # Fire diagnostic event
+  - alias: Publish cube action event
     event: cube_last_action
     event_data:
       action: "{{ action }}"
@@ -1308,392 +1044,400 @@ action:
       ieee_id: "{{ ieee_id }}"
       angle: "{{ angle }}"
       mode: "{{ op_mode }}"
-  - alias: "Store the current_side as the last_side for the next trigger"
+
+  # Update last_side state
+  - alias: Store current side as last_side
     service: number.set_value
     target:
-      entity_id: "{{ num_ha_name }}"
+      entity_id: "{{ num_entity_id }}"
     data:
       value: "{{ side }}"
-  - alias: "Choose Action Mode or Scene Mode"
+
+  # Mode-specific action handlers
+  - alias: Route to mode handler
     choose:
-      - conditions: '{{ op_mode == "action_mode" }}'
+      # === ACTION MODE ===
+      - conditions: "{{ op_mode == 'action_mode' }}"
         sequence:
-          - alias: ACTION MODE Group 2 🟣 and No Group 🟡 These are action events for ANY Side
+          # Group 2 & 4: Any-side and unique actions
+          - alias: Handle any-side and unique actions
             choose:
-              - conditions: '{{ action == "slide" }}'
-                sequence: !input "action_slide_any"
-              - conditions: '{{ action == "tap" }}'
-                sequence: !input "action_doubletap_any"
-              - conditions: '{{ action == "rotate_right" }}'
-                sequence: !input "action_rotate_cw_any"
-              - conditions: '{{ action == "rotate_left" }}'
-                sequence: !input "action_rotate_ccw_any"
-              - conditions: '{{ action == "shake" }}'
-                sequence: !input "action_shake"
-              - conditions: '{{ action == "throw" }}'
-                sequence: !input "action_throw"
-              - conditions: '{{ action == "flip90" }}'
+              - conditions: "{{ action == 'slide' }}"
+                sequence: !input act_any_slide
+              - conditions: "{{ action == 'tap' }}"
+                sequence: !input act_any_doubletap
+              - conditions: "{{ action == 'rotate_right' }}"
+                sequence: !input act_any_rotate_cw
+              - conditions: "{{ action == 'rotate_left' }}"
+                sequence: !input act_any_rotate_ccw
+              - conditions: "{{ action == 'shake' }}"
+                sequence: !input act_shake
+              - conditions: "{{ action == 'throw' }}"
+                sequence: !input act_throw
+              - conditions: "{{ action == 'flip90' }}"
                 sequence:
                   - parallel:
-                      - !input "action_flipped90_any"
-                      - alias: These are flip to specific side from any side events
-                        choose: &flip1
+                      - !input act_any_flip90
+                      - choose:
                           - conditions: "{{ side == 1 }}"
-                            sequence: !input "action_flip_from_any_to_face_1"
+                            sequence: !input act_s1_flip_any
                           - conditions: "{{ side == 2 }}"
-                            sequence: !input "action_flip_from_any_to_face_2"
+                            sequence: !input act_s2_flip_any
                           - conditions: "{{ side == 3 }}"
-                            sequence: !input "action_flip_from_any_to_face_3"
+                            sequence: !input act_s3_flip_any
                           - conditions: "{{ side == 4 }}"
-                            sequence: !input "action_flip_from_any_to_face_4"
+                            sequence: !input act_s4_flip_any
                           - conditions: "{{ side == 5 }}"
-                            sequence: !input "action_flip_from_any_to_face_5"
+                            sequence: !input act_s5_flip_any
                           - conditions: "{{ side == 6 }}"
-                            sequence: !input "action_flip_from_any_to_face_6"
-              - conditions: '{{ action == "flip180" }}'
+                            sequence: !input act_s6_flip_any
+              - conditions: "{{ action == 'flip180' }}"
                 sequence:
                   - parallel:
-                      - !input "action_flipped180_any"
-                      - alias: These are flip to specific side from any side events
-                        choose:
-                          *flip1
-          - alias: ACTION MODE Group 1 🔴 These are action events based on the action broken down by side
+                      - !input act_any_flip180
+                      - choose:
+                          - conditions: "{{ side == 1 }}"
+                            sequence: !input act_s1_flip_any
+                          - conditions: "{{ side == 2 }}"
+                            sequence: !input act_s2_flip_any
+                          - conditions: "{{ side == 3 }}"
+                            sequence: !input act_s3_flip_any
+                          - conditions: "{{ side == 4 }}"
+                            sequence: !input act_s4_flip_any
+                          - conditions: "{{ side == 5 }}"
+                            sequence: !input act_s5_flip_any
+                          - conditions: "{{ side == 6 }}"
+                            sequence: !input act_s6_flip_any
+
+          # Group 1: Side-specific actions
+          - alias: Handle side-specific actions
             choose:
-              - conditions: '{{ action == "slide" }}'
+              - conditions: "{{ action == 'slide' }}"
                 sequence:
-                  - alias: ACTION MODE Group 1 🔴 These are slide events
-                    choose:
+                  - choose:
                       - conditions: "{{ side == 1 }}"
-                        sequence: !input "action_slide_face_1"
+                        sequence: !input act_s1_slide
                       - conditions: "{{ side == 2 }}"
-                        sequence: !input "action_slide_face_2"
+                        sequence: !input act_s2_slide
                       - conditions: "{{ side == 3 }}"
-                        sequence: !input "action_slide_face_3"
+                        sequence: !input act_s3_slide
                       - conditions: "{{ side == 4 }}"
-                        sequence: !input "action_slide_face_4"
+                        sequence: !input act_s4_slide
                       - conditions: "{{ side == 5 }}"
-                        sequence: !input "action_slide_face_5"
+                        sequence: !input act_s5_slide
                       - conditions: "{{ side == 6 }}"
-                        sequence: !input "action_slide_face_6"
-              - conditions: '{{ action == "tap" }}'
+                        sequence: !input act_s6_slide
+              - conditions: "{{ action == 'tap' }}"
                 sequence:
-                  - alias: ACTION MODE Group 1 🔴 These are doubletap events
-                    choose:
+                  - choose:
                       - conditions: "{{ side == 1 }}"
-                        sequence: !input "action_doubletap_face_1"
+                        sequence: !input act_s1_doubletap
                       - conditions: "{{ side == 2 }}"
-                        sequence: !input "action_doubletap_face_2"
+                        sequence: !input act_s2_doubletap
                       - conditions: "{{ side == 3 }}"
-                        sequence: !input "action_doubletap_face_3"
+                        sequence: !input act_s3_doubletap
                       - conditions: "{{ side == 4 }}"
-                        sequence: !input "action_doubletap_face_4"
+                        sequence: !input act_s4_doubletap
                       - conditions: "{{ side == 5 }}"
-                        sequence: !input "action_doubletap_face_5"
+                        sequence: !input act_s5_doubletap
                       - conditions: "{{ side == 6 }}"
-                        sequence: !input "action_doubletap_face_6"
-              - conditions: '{{ action == "flip90" }}'
+                        sequence: !input act_s6_doubletap
+              - conditions: "{{ action == 'flip90' }}"
                 sequence:
-                  - alias: ACTION MODE Group 1 🔴 These are flipped90 events
-                    choose:
+                  - choose:
                       - conditions: "{{ side == 1 }}"
-                        sequence: !input "action_flipped90_face_1"
+                        sequence: !input act_s1_flip90
                       - conditions: "{{ side == 2 }}"
-                        sequence: !input "action_flipped90_face_2"
+                        sequence: !input act_s2_flip90
                       - conditions: "{{ side == 3 }}"
-                        sequence: !input "action_flipped90_face_3"
+                        sequence: !input act_s3_flip90
                       - conditions: "{{ side == 4 }}"
-                        sequence: !input "action_flipped90_face_4"
+                        sequence: !input act_s4_flip90
                       - conditions: "{{ side == 5 }}"
-                        sequence: !input "action_flipped90_face_5"
+                        sequence: !input act_s5_flip90
                       - conditions: "{{ side == 6 }}"
-                        sequence: !input "action_flipped90_face_6"
-              - conditions: '{{ action == "flip180" }}'
+                        sequence: !input act_s6_flip90
+              - conditions: "{{ action == 'flip180' }}"
                 sequence:
-                  - alias: ACTION MODE Group 1 🔴 These are flipped180 events
-                    choose:
+                  - choose:
                       - conditions: "{{ side == 1 }}"
-                        sequence: !input "action_flipped180_face_1"
+                        sequence: !input act_s1_flip180
                       - conditions: "{{ side == 2 }}"
-                        sequence: !input "action_flipped180_face_2"
+                        sequence: !input act_s2_flip180
                       - conditions: "{{ side == 3 }}"
-                        sequence: !input "action_flipped180_face_3"
+                        sequence: !input act_s3_flip180
                       - conditions: "{{ side == 4 }}"
-                        sequence: !input "action_flipped180_face_4"
+                        sequence: !input act_s4_flip180
                       - conditions: "{{ side == 5 }}"
-                        sequence: !input "action_flipped180_face_5"
+                        sequence: !input act_s5_flip180
                       - conditions: "{{ side == 6 }}"
-                        sequence: !input "action_flipped180_face_6"
-              - conditions: '{{ action == "rotate_right" }}'
+                        sequence: !input act_s6_flip180
+              - conditions: "{{ action == 'rotate_right' }}"
                 sequence:
-                  - alias: ACTION MODE Group 1 🔴 These are rotate CW events
-                    choose:
+                  - choose:
                       - conditions: "{{ side == 1 }}"
-                        sequence: !input "action_rotate_cw_face_1"
+                        sequence: !input act_s1_rotate_cw
                       - conditions: "{{ side == 2 }}"
-                        sequence: !input "action_rotate_cw_face_2"
+                        sequence: !input act_s2_rotate_cw
                       - conditions: "{{ side == 3 }}"
-                        sequence: !input "action_rotate_cw_face_3"
+                        sequence: !input act_s3_rotate_cw
                       - conditions: "{{ side == 4 }}"
-                        sequence: !input "action_rotate_cw_face_4"
+                        sequence: !input act_s4_rotate_cw
                       - conditions: "{{ side == 5 }}"
-                        sequence: !input "action_rotate_cw_face_5"
+                        sequence: !input act_s5_rotate_cw
                       - conditions: "{{ side == 6 }}"
-                        sequence: !input "action_rotate_cw_face_6"
-              - conditions: '{{ action == "rotate_left" }}'
+                        sequence: !input act_s6_rotate_cw
+              - conditions: "{{ action == 'rotate_left' }}"
                 sequence:
-                  - alias: ACTION MODE Group 1 🔴 These are rotate CCW events
-                    choose:
+                  - choose:
                       - conditions: "{{ side == 1 }}"
-                        sequence: !input "action_rotate_ccw_face_1"
+                        sequence: !input act_s1_rotate_ccw
                       - conditions: "{{ side == 2 }}"
-                        sequence: !input "action_rotate_ccw_face_2"
+                        sequence: !input act_s2_rotate_ccw
                       - conditions: "{{ side == 3 }}"
-                        sequence: !input "action_rotate_ccw_face_3"
+                        sequence: !input act_s3_rotate_ccw
                       - conditions: "{{ side == 4 }}"
-                        sequence: !input "action_rotate_ccw_face_4"
+                        sequence: !input act_s4_rotate_ccw
                       - conditions: "{{ side == 5 }}"
-                        sequence: !input "action_rotate_ccw_face_5"
+                        sequence: !input act_s5_rotate_ccw
                       - conditions: "{{ side == 6 }}"
-                        sequence: !input "action_rotate_ccw_face_6"
-          - alias: ACTION MODE Group 3 🟢 Side to side jump events
+                        sequence: !input act_s6_rotate_ccw
+
+          # Group 3: Side-to-side transitions
+          - alias: Handle side transition actions
             choose:
               - conditions: "{{ side == 1 }}"
                 sequence:
-                  - alias: ACTION MODE Group 3 🟢 To side 1 from any events
-                    choose:
+                  - choose:
                       - conditions: "{{ last_side == 2 }}"
-                        sequence: !input "action_1_from_2"
+                        sequence: !input act_1from2
                       - conditions: "{{ last_side == 3 }}"
-                        sequence: !input "action_1_from_3"
+                        sequence: !input act_1from3
                       - conditions: "{{ last_side == 4 }}"
-                        sequence: !input "action_1_from_4"
+                        sequence: !input act_1from4
                       - conditions: "{{ last_side == 5 }}"
-                        sequence: !input "action_1_from_5"
+                        sequence: !input act_1from5
                       - conditions: "{{ last_side == 6 }}"
-                        sequence: !input "action_1_from_6"
+                        sequence: !input act_1from6
               - conditions: "{{ side == 2 }}"
                 sequence:
-                  - alias: ACTION MODE Group 3 🟢 To side 2 from any events
-                    choose:
+                  - choose:
                       - conditions: "{{ last_side == 1 }}"
-                        sequence: !input "action_2_from_1"
+                        sequence: !input act_2from1
                       - conditions: "{{ last_side == 3 }}"
-                        sequence: !input "action_2_from_3"
+                        sequence: !input act_2from3
                       - conditions: "{{ last_side == 4 }}"
-                        sequence: !input "action_2_from_4"
+                        sequence: !input act_2from4
                       - conditions: "{{ last_side == 5 }}"
-                        sequence: !input "action_2_from_5"
+                        sequence: !input act_2from5
                       - conditions: "{{ last_side == 6 }}"
-                        sequence: !input "action_2_from_6"
+                        sequence: !input act_2from6
               - conditions: "{{ side == 3 }}"
                 sequence:
-                  - alias: ACTION MODE Group 3 🟢 To side 3 from any events
-                    choose:
+                  - choose:
                       - conditions: "{{ last_side == 1 }}"
-                        sequence: !input "action_3_from_1"
+                        sequence: !input act_3from1
                       - conditions: "{{ last_side == 2 }}"
-                        sequence: !input "action_3_from_2"
+                        sequence: !input act_3from2
                       - conditions: "{{ last_side == 4 }}"
-                        sequence: !input "action_3_from_4"
+                        sequence: !input act_3from4
                       - conditions: "{{ last_side == 5 }}"
-                        sequence: !input "action_3_from_5"
+                        sequence: !input act_3from5
                       - conditions: "{{ last_side == 6 }}"
-                        sequence: !input "action_3_from_6"
+                        sequence: !input act_3from6
               - conditions: "{{ side == 4 }}"
                 sequence:
-                  - alias: ACTION MODE Group 3 🟢 To side 4 from any events
-                    choose:
+                  - choose:
                       - conditions: "{{ last_side == 1 }}"
-                        sequence: !input "action_4_from_1"
+                        sequence: !input act_4from1
                       - conditions: "{{ last_side == 2 }}"
-                        sequence: !input "action_4_from_2"
+                        sequence: !input act_4from2
                       - conditions: "{{ last_side == 3 }}"
-                        sequence: !input "action_4_from_3"
+                        sequence: !input act_4from3
                       - conditions: "{{ last_side == 5 }}"
-                        sequence: !input "action_4_from_5"
+                        sequence: !input act_4from5
                       - conditions: "{{ last_side == 6 }}"
-                        sequence: !input "action_4_from_6"
+                        sequence: !input act_4from6
               - conditions: "{{ side == 5 }}"
                 sequence:
-                  - alias: ACTION MODE Group 3 🟢 To side 5 from any events
-                    choose:
+                  - choose:
                       - conditions: "{{ last_side == 1 }}"
-                        sequence: !input "action_5_from_1"
+                        sequence: !input act_5from1
                       - conditions: "{{ last_side == 2 }}"
-                        sequence: !input "action_5_from_2"
+                        sequence: !input act_5from2
                       - conditions: "{{ last_side == 3 }}"
-                        sequence: !input "action_5_from_3"
+                        sequence: !input act_5from3
                       - conditions: "{{ last_side == 4 }}"
-                        sequence: !input "action_5_from_4"
+                        sequence: !input act_5from4
                       - conditions: "{{ last_side == 6 }}"
-                        sequence: !input "action_5_from_6"
+                        sequence: !input act_5from6
               - conditions: "{{ side == 6 }}"
                 sequence:
-                  - alias: ACTION MODE Group 3 🟢 To side 6 from any events
-                    choose:
+                  - choose:
                       - conditions: "{{ last_side == 1 }}"
-                        sequence: !input "action_6_from_1"
+                        sequence: !input act_6from1
                       - conditions: "{{ last_side == 2 }}"
-                        sequence: !input "action_6_from_2"
+                        sequence: !input act_6from2
                       - conditions: "{{ last_side == 3 }}"
-                        sequence: !input "action_6_from_3"
+                        sequence: !input act_6from3
                       - conditions: "{{ last_side == 4 }}"
-                        sequence: !input "action_6_from_4"
+                        sequence: !input act_6from4
                       - conditions: "{{ last_side == 5 }}"
-                        sequence: !input "action_6_from_5"
-      - conditions: '{{ op_mode == "scene_mode" }}'
+                        sequence: !input act_6from5
+
+      # === SCENE MODE ===
+      - conditions: "{{ op_mode == 'scene_mode' }}"
         sequence:
-          - alias: SCENE MODE Group 2 🟣 and No Group 🟡 These are action events for ANY Side
+          # Group 2 & 4: Any-side and unique actions
+          - alias: Handle any-side and unique actions
             choose:
-              - conditions: '{{ action == "flip_to_side" }}'
-                sequence: !input "scene_flip_to_side_any"
-              - conditions: '{{ action == "rotate_right" }}'
-                sequence: !input "scene_rotate_cw_any"
-              - conditions: '{{ action == "rotate_left" }}'
-                sequence: !input "scene_rotate_ccw_any"
-              - conditions: '{{ action == "hold" }}'
-                sequence: !input "scene_hold"
-              - conditions: '{{ action == "shake" }}'
-                sequence: !input "scene_shake"
-              - conditions: '{{ action == "throw" }}'
-                sequence: !input "scene_throw"
-          - alias: SCENE MODE Group 1 🔴 These are action events based on the action broken down by side
+              - conditions: "{{ action == 'flip_to_side' }}"
+                sequence: !input scn_any_flip
+              - conditions: "{{ action == 'rotate_right' }}"
+                sequence: !input scn_any_rotate_cw
+              - conditions: "{{ action == 'rotate_left' }}"
+                sequence: !input scn_any_rotate_ccw
+              - conditions: "{{ action == 'hold' }}"
+                sequence: !input scn_hold
+              - conditions: "{{ action == 'shake' }}"
+                sequence: !input scn_shake
+              - conditions: "{{ action == 'throw' }}"
+                sequence: !input scn_throw
+
+          # Group 1: Side-specific actions
+          - alias: Handle side-specific actions
             choose:
-              - conditions: '{{ action == "flip_to_side" }}'
+              - conditions: "{{ action == 'flip_to_side' }}"
                 sequence:
-                  - alias: SCENE MODE Group 1 🔴 These are flip_to_side events
-                    choose:
+                  - choose:
                       - conditions: "{{ side == 1 }}"
-                        sequence: !input "scene_flip_to_face_1"
+                        sequence: !input scn_s1_flip
                       - conditions: "{{ side == 2 }}"
-                        sequence: !input "scene_flip_to_face_2"
+                        sequence: !input scn_s2_flip
                       - conditions: "{{ side == 3 }}"
-                        sequence: !input "scene_flip_to_face_3"
+                        sequence: !input scn_s3_flip
                       - conditions: "{{ side == 4 }}"
-                        sequence: !input "scene_flip_to_face_4"
+                        sequence: !input scn_s4_flip
                       - conditions: "{{ side == 5 }}"
-                        sequence: !input "scene_flip_to_face_5"
+                        sequence: !input scn_s5_flip
                       - conditions: "{{ side == 6 }}"
-                        sequence: !input "scene_flip_to_face_6"
-              - conditions: '{{ action == "rotate_right" }}'
+                        sequence: !input scn_s6_flip
+              - conditions: "{{ action == 'rotate_right' }}"
                 sequence:
-                  - alias: SCENE MODE Group 1 🔴 These are rotate CW events
-                    choose:
+                  - choose:
                       - conditions: "{{ side == 1 }}"
-                        sequence: !input "scene_rotate_cw_face_1"
+                        sequence: !input scn_s1_rotate_cw
                       - conditions: "{{ side == 2 }}"
-                        sequence: !input "scene_rotate_cw_face_2"
+                        sequence: !input scn_s2_rotate_cw
                       - conditions: "{{ side == 3 }}"
-                        sequence: !input "scene_rotate_cw_face_3"
+                        sequence: !input scn_s3_rotate_cw
                       - conditions: "{{ side == 4 }}"
-                        sequence: !input "scene_rotate_cw_face_4"
+                        sequence: !input scn_s4_rotate_cw
                       - conditions: "{{ side == 5 }}"
-                        sequence: !input "scene_rotate_cw_face_5"
+                        sequence: !input scn_s5_rotate_cw
                       - conditions: "{{ side == 6 }}"
-                        sequence: !input "scene_rotate_cw_face_6"
-              - conditions: '{{ action == "rotate_left" }}'
+                        sequence: !input scn_s6_rotate_cw
+              - conditions: "{{ action == 'rotate_left' }}"
                 sequence:
-                  - alias: SCENE MODE Group 1 🔴 These are rotate CCW events
-                    choose:
+                  - choose:
                       - conditions: "{{ side == 1 }}"
-                        sequence: !input "scene_rotate_ccw_face_1"
+                        sequence: !input scn_s1_rotate_ccw
                       - conditions: "{{ side == 2 }}"
-                        sequence: !input "scene_rotate_ccw_face_2"
+                        sequence: !input scn_s2_rotate_ccw
                       - conditions: "{{ side == 3 }}"
-                        sequence: !input "scene_rotate_ccw_face_3"
+                        sequence: !input scn_s3_rotate_ccw
                       - conditions: "{{ side == 4 }}"
-                        sequence: !input "scene_rotate_ccw_face_4"
+                        sequence: !input scn_s4_rotate_ccw
                       - conditions: "{{ side == 5 }}"
-                        sequence: !input "scene_rotate_ccw_face_5"
+                        sequence: !input scn_s5_rotate_ccw
                       - conditions: "{{ side == 6 }}"
-                        sequence: !input "scene_rotate_ccw_face_6"
-          - alias: SCENE MODE Group 3 🟢 Side to side jump events
+                        sequence: !input scn_s6_rotate_ccw
+
+          # Group 3: Side-to-side transitions
+          - alias: Handle side transition actions
             choose:
               - conditions: "{{ side == 1 }}"
                 sequence:
-                  - alias: SCENE MODE Group 3 🟢 To side 1 from specific events
-                    choose:
+                  - choose:
                       - conditions: "{{ last_side == 2 }}"
-                        sequence: !input "scene_1_from_2"
+                        sequence: !input scn_1from2
                       - conditions: "{{ last_side == 3 }}"
-                        sequence: !input "scene_1_from_3"
+                        sequence: !input scn_1from3
                       - conditions: "{{ last_side == 4 }}"
-                        sequence: !input "scene_1_from_4"
+                        sequence: !input scn_1from4
                       - conditions: "{{ last_side == 5 }}"
-                        sequence: !input "scene_1_from_5"
+                        sequence: !input scn_1from5
                       - conditions: "{{ last_side == 6 }}"
-                        sequence: !input "scene_1_from_6"
+                        sequence: !input scn_1from6
               - conditions: "{{ side == 2 }}"
                 sequence:
-                  - alias: SCENE MODE Group 3 🟢 To side 2 from specific events
-                    choose:
+                  - choose:
                       - conditions: "{{ last_side == 1 }}"
-                        sequence: !input "scene_2_from_1"
+                        sequence: !input scn_2from1
                       - conditions: "{{ last_side == 3 }}"
-                        sequence: !input "scene_2_from_3"
+                        sequence: !input scn_2from3
                       - conditions: "{{ last_side == 4 }}"
-                        sequence: !input "scene_2_from_4"
+                        sequence: !input scn_2from4
                       - conditions: "{{ last_side == 5 }}"
-                        sequence: !input "scene_2_from_5"
+                        sequence: !input scn_2from5
                       - conditions: "{{ last_side == 6 }}"
-                        sequence: !input "scene_2_from_6"
+                        sequence: !input scn_2from6
               - conditions: "{{ side == 3 }}"
                 sequence:
-                  - alias: SCENE MODE Group 3 🟢 To side 3 from specific events
-                    choose:
+                  - choose:
                       - conditions: "{{ last_side == 1 }}"
-                        sequence: !input "scene_3_from_1"
+                        sequence: !input scn_3from1
                       - conditions: "{{ last_side == 2 }}"
-                        sequence: !input "scene_3_from_2"
+                        sequence: !input scn_3from2
                       - conditions: "{{ last_side == 4 }}"
-                        sequence: !input "scene_3_from_4"
+                        sequence: !input scn_3from4
                       - conditions: "{{ last_side == 5 }}"
-                        sequence: !input "scene_3_from_5"
+                        sequence: !input scn_3from5
                       - conditions: "{{ last_side == 6 }}"
-                        sequence: !input "scene_3_from_6"
+                        sequence: !input scn_3from6
               - conditions: "{{ side == 4 }}"
                 sequence:
-                  - alias: SCENE MODE Group 3 🟢 To side 4 from specific events
-                    choose:
+                  - choose:
                       - conditions: "{{ last_side == 1 }}"
-                        sequence: !input "scene_4_from_1"
+                        sequence: !input scn_4from1
                       - conditions: "{{ last_side == 2 }}"
-                        sequence: !input "scene_4_from_2"
+                        sequence: !input scn_4from2
                       - conditions: "{{ last_side == 3 }}"
-                        sequence: !input "scene_4_from_3"
+                        sequence: !input scn_4from3
                       - conditions: "{{ last_side == 5 }}"
-                        sequence: !input "scene_4_from_5"
+                        sequence: !input scn_4from5
                       - conditions: "{{ last_side == 6 }}"
-                        sequence: !input "scene_4_from_6"
+                        sequence: !input scn_4from6
               - conditions: "{{ side == 5 }}"
                 sequence:
-                  - alias: SCENE MODE Group 3 🟢 To side 5 from specific events
-                    choose:
+                  - choose:
                       - conditions: "{{ last_side == 1 }}"
-                        sequence: !input "scene_5_from_1"
+                        sequence: !input scn_5from1
                       - conditions: "{{ last_side == 2 }}"
-                        sequence: !input "scene_5_from_2"
+                        sequence: !input scn_5from2
                       - conditions: "{{ last_side == 3 }}"
-                        sequence: !input "scene_5_from_3"
+                        sequence: !input scn_5from3
                       - conditions: "{{ last_side == 4 }}"
-                        sequence: !input "scene_5_from_4"
+                        sequence: !input scn_5from4
                       - conditions: "{{ last_side == 6 }}"
-                        sequence: !input "scene_5_from_6"
+                        sequence: !input scn_5from6
               - conditions: "{{ side == 6 }}"
                 sequence:
-                  - alias: SCENE MODE Group 3 🟢 To side 6 from specific events
-                    choose:
+                  - choose:
                       - conditions: "{{ last_side == 1 }}"
-                        sequence: !input "scene_6_from_1"
+                        sequence: !input scn_6from1
                       - conditions: "{{ last_side == 2 }}"
-                        sequence: !input "scene_6_from_2"
+                        sequence: !input scn_6from2
                       - conditions: "{{ last_side == 3 }}"
-                        sequence: !input "scene_6_from_3"
+                        sequence: !input scn_6from3
                       - conditions: "{{ last_side == 4 }}"
-                        sequence: !input "scene_6_from_4"
+                        sequence: !input scn_6from4
                       - conditions: "{{ last_side == 5 }}"
-                        sequence: !input "scene_6_from_5"
-  - alias: "Delay ⏱ for debounce so toggle functions work. Also blueprint is in single mode."
-    delay: 00:00:01
+                        sequence: !input scn_6from5
+
+  # Debounce delay for toggle functions
+  - alias: Debounce delay
+    delay: "00:00:01"
+
 mode: single
 max_exceeded: silent
