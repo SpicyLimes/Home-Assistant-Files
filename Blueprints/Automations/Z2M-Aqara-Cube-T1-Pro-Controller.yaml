@@ -21,6 +21,7 @@ blueprint:
     - 🍕 Group 4: Mode-specific unique actions (5 total)
     
     ⚠️ **Warning:** Groups 1, 2, and 3 can trigger simultaneously. Choose one group per automation to avoid conflicts.
+    **Note:** Group 4 Actions can be combined with any other group, however for simple actions, choose Group 2 and 4. If more actions/options are desired, use Groups 1 -OR- Group 3, and Group 4. 
     
     [Documentation](https://github.com/SirGoodenough/HA_Blueprints/blob/master/Automations/Zigbee2MQTT%20-%20Xiaomi%20Cube%20Controller%20MQTT%20Triggered.md) | 
     [Community Discussion](https://community.home-assistant.io/t/zigbee2mqtt-aqara-magic-cube-t1-pro-ctp-r01-xiaomi-lumi-cagl02/525111)
