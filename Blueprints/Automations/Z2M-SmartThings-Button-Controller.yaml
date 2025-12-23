@@ -1,7 +1,14 @@
 blueprint:
   name: SmartThings Button Controller (Zigbee2MQTT)
   description: |
-    Control actions for your Samsung SmartThings Button (IM6001-BTP01) via Zigbee2MQTT using the modern MQTT device triggers. Supports single press, double press, and hold.
+    Control actions for your Samsung SmartThings Button (IM6001-BTP01) via Zigbee2MQTT using the modern MQTT device triggers.
+    
+    This blueprint supports the standard actions exposed by Zigbee2MQTT:
+    - Single Press
+    - Double Press
+    - Hold (Long Press)
+    
+    Note: Ensure your device exposes all these actions in Zigbee2MQTT.
   author: "SpicyLimes"
   source_url: https://github.com/SpicyLimes/Home-Assistant-Files/blob/main/Blueprints/Automations/Z2M-SmartThings-Button-Controller.yaml
   domain: automation
@@ -12,7 +19,6 @@ blueprint:
       selector:
         device:
           integration: mqtt
-          manufacturer: Samsung Electronics
           model: IM6001-BTP01
     single_press_actions:
       name: Actions for Single Press
@@ -50,8 +56,8 @@ trigger:
     device_id: !input button_device
     domain: mqtt
     type: action
-    subtype: held
-    id: held
+    subtype: hold
+    id: hold
 
 condition: []
 
@@ -67,7 +73,8 @@ action:
         sequence: !input double_press_actions
       - conditions:
           - condition: trigger
-            id: held
+            id: hold
         sequence: !input hold_actions
 
-mode: single
+mode: restart
+max_exceeded: silent
