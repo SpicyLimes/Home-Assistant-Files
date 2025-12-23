@@ -18,7 +18,7 @@ blueprint:
       description: Select the MQTT device for your SmartThings Button (found under Devices & Services > Devices > MQTT integration).
       selector:
         device:
-          integration: mqtt
+
     single_press_actions:
       name: Actions for Single Press
       description: Actions to perform on single press.
