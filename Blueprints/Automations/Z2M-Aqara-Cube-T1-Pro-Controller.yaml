@@ -9,10 +9,10 @@ blueprint:
     - Two operation modes: Action Mode and Scene Mode
 
     **Action Groups:**
-    - 🎯 Group 1: Side-specific actions (36 action + 18 scene)
-    - 👍 Group 2: Any-side actions (6 action + 3 scene)
-    - 🍊 Group 3: Side-to-side transitions (30 action + 30 scene)
-    - 🍕 Group 4: Mode-specific unique actions (5 total)
+    - 🔴 Group 1: Side-specific actions (36 action + 18 scene)
+    - 🟠 Group 2: Any-side actions (6 action + 3 scene)
+    - 🟡 Group 3: Side-to-side transitions (30 action + 30 scene)
+    - 🟢 Group 4: Mode-specific unique actions (5 total)
 
     **Important Notes:**
     - MQTT topic must contain only alphanumeric characters (A-Z, a-z, 0-9)
@@ -71,7 +71,7 @@ blueprint:
 
     # Action Mode - Group 1 (Side-Specific)
     action_g1_side1:
-      name: "Action Mode - Side 1 (Aqara Logo) - Group 1 🎯"
+      name: "Action Mode - Side 1 (Aqara Logo) - Group 1 🔴"
       icon: mdi:numeric-1-box
       collapsed: true
       description: Side-specific actions for Face 1 (Aqara logo side)
@@ -114,7 +114,7 @@ blueprint:
             action: {}
 
     action_g1_side2:
-      name: "Action Mode - Side 2 - Group 1 🎯"
+      name: "Action Mode - Side 2 - Group 1 🔴"
       icon: mdi:numeric-2-box
       collapsed: true
       input:
@@ -156,7 +156,7 @@ blueprint:
             action: {}
 
     action_g1_side3:
-      name: "Action Mode - Side 3 - Group 1 🎯"
+      name: "Action Mode - Side 3 - Group 1 🔴"
       icon: mdi:numeric-3-box
       collapsed: true
       input:
@@ -198,7 +198,7 @@ blueprint:
             action: {}
 
     action_g1_side4:
-      name: "Action Mode - Side 4 - Group 1 🎯"
+      name: "Action Mode - Side 4 - Group 1 🔴"
       icon: mdi:numeric-4-box
       collapsed: true
       input:
@@ -240,7 +240,7 @@ blueprint:
             action: {}
 
     action_g1_side5:
-      name: "Action Mode - Side 5 - Group 1 🎯"
+      name: "Action Mode - Side 5 - Group 1 🔴"
       icon: mdi:numeric-5-box
       collapsed: true
       input:
@@ -282,7 +282,7 @@ blueprint:
             action: {}
 
     action_g1_side6:
-      name: "Action Mode - Side 6 - Group 1 🎯"
+      name: "Action Mode - Side 6 - Group 1 🔴"
       icon: mdi:numeric-6-box
       collapsed: true
       input:
@@ -325,7 +325,7 @@ blueprint:
 
     # Action Mode - Group 2 (Any Side)
     action_g2_any:
-      name: "Action Mode - Any Side - Group 2 👍"
+      name: "Action Mode - Any Side - Group 2 🟠"
       icon: mdi:cube-outline
       collapsed: true
       description: |
@@ -366,7 +366,7 @@ blueprint:
 
     # Action Mode - Group 3 (Side Transitions)
     action_g3_to_side1:
-      name: "Action Mode - Flip to Side 1 - Group 3 🍊"
+      name: "Action Mode - Flip to Side 1 - Group 3 🟡"
       icon: mdi:numeric-1-circle
       collapsed: true
       description: |
@@ -399,7 +399,7 @@ blueprint:
             action: {}
 
     action_g3_to_side2:
-      name: "Action Mode - Flip to Side 2 - Group 3 🍊"
+      name: "Action Mode - Flip to Side 2 - Group 3 🟡"
       icon: mdi:numeric-2-circle
       collapsed: true
       input:
@@ -430,7 +430,7 @@ blueprint:
             action: {}
 
     action_g3_to_side3:
-      name: "Action Mode - Flip to Side 3 - Group 3 🍊"
+      name: "Action Mode - Flip to Side 3 - Group 3 🟡"
       icon: mdi:numeric-3-circle
       collapsed: true
       input:
@@ -461,7 +461,7 @@ blueprint:
             action: {}
 
     action_g3_to_side4:
-      name: "Action Mode - Flip to Side 4 - Group 3 🍊"
+      name: "Action Mode - Flip to Side 4 - Group 3 🟡"
       icon: mdi:numeric-4-circle
       collapsed: true
       input:
@@ -492,7 +492,7 @@ blueprint:
             action: {}
 
     action_g3_to_side5:
-      name: "Action Mode - Flip to Side 5 - Group 3 🍊"
+      name: "Action Mode - Flip to Side 5 - Group 3 🟡"
       icon: mdi:numeric-5-circle
       collapsed: true
       input:
@@ -523,7 +523,7 @@ blueprint:
             action: {}
 
     action_g3_to_side6:
-      name: "Action Mode - Flip to Side 6 - Group 3 🍊"
+      name: "Action Mode - Flip to Side 6 - Group 3 🟡"
       icon: mdi:numeric-6-circle
       collapsed: true
       input:
@@ -555,7 +555,7 @@ blueprint:
 
     # Action Mode - Group 4 (Unique Actions)
     action_g4_unique:
-      name: "Action Mode - Unique Actions - Group 4 🍕"
+      name: "Action Mode - Unique Actions - Group 4 🟢"
       icon: mdi:gesture
       collapsed: true
       description: These actions can be safely combined with any other group
@@ -576,7 +576,7 @@ blueprint:
 
     # Scene Mode - Group 1 (Side-Specific)
     scene_g1_side1:
-      name: "👀 Scene Mode - Side 1 (Aqara Logo) - Group 1 🎯"
+      name: "👀 Scene Mode - Side 1 (Aqara Logo) - Group 1 🔵"
       icon: mdi:numeric-1-box
       collapsed: true
       input:
@@ -597,7 +597,7 @@ blueprint:
             action: {}
 
     scene_g1_side2:
-      name: "👀 Scene Mode - Side 2 - Group 1 🎯"
+      name: "👀 Scene Mode - Side 2 - Group 1 🔵"
       icon: mdi:numeric-2-box
       collapsed: true
       input:
@@ -618,7 +618,7 @@ blueprint:
             action: {}
 
     scene_g1_side3:
-      name: "👀 Scene Mode - Side 3 - Group 1 🎯"
+      name: "👀 Scene Mode - Side 3 - Group 1 🔵"
       icon: mdi:numeric-3-box
       collapsed: true
       input:
@@ -639,7 +639,7 @@ blueprint:
             action: {}
 
     scene_g1_side4:
-      name: "👀 Scene Mode - Side 4 - Group 1 🎯"
+      name: "👀 Scene Mode - Side 4 - Group 1 🔵"
       icon: mdi:numeric-4-box
       collapsed: true
       input:
@@ -660,7 +660,7 @@ blueprint:
             action: {}
 
     scene_g1_side5:
-      name: "👀 Scene Mode - Side 5 - Group 1 🎯"
+      name: "👀 Scene Mode - Side 5 - Group 1 🔵"
       icon: mdi:numeric-5-box
       collapsed: true
       input:
@@ -681,7 +681,7 @@ blueprint:
             action: {}
 
     scene_g1_side6:
-      name: "👀 Scene Mode - Side 6 - Group 1 🎯"
+      name: "👀 Scene Mode - Side 6 - Group 1 🔵"
       icon: mdi:numeric-6-box
       collapsed: true
       input:
@@ -703,7 +703,7 @@ blueprint:
 
     # Scene Mode - Group 2 (Any Side)
     scene_g2_any:
-      name: "👀 Scene Mode - Any Side - Group 2 👍"
+      name: "👀 Scene Mode - Any Side - Group 2 🟣"
       icon: mdi:cube-outline
       collapsed: true
       description: |
@@ -727,7 +727,7 @@ blueprint:
 
     # Scene Mode - Group 3 (Side Transitions)
     scene_g3_to_side1:
-      name: "👀 Scene Mode - Flip to Side 1 - Group 3 🍊"
+      name: "👀 Scene Mode - Flip to Side 1 - Group 3 🟤"
       icon: mdi:numeric-1-circle
       collapsed: true
       input:
@@ -758,7 +758,7 @@ blueprint:
             action: {}
 
     scene_g3_to_side2:
-      name: "👀 Scene Mode - Flip to Side 2 - Group 3 🍊"
+      name: "👀 Scene Mode - Flip to Side 2 - Group 3 🟤"
       icon: mdi:numeric-2-circle
       collapsed: true
       input:
@@ -789,7 +789,7 @@ blueprint:
             action: {}
 
     scene_g3_to_side3:
-      name: "👀 Scene Mode - Flip to Side 3 - Group 3 🍊"
+      name: "👀 Scene Mode - Flip to Side 3 - Group 3 🟤"
       icon: mdi:numeric-3-circle
       collapsed: true
       input:
@@ -820,7 +820,7 @@ blueprint:
             action: {}
 
     scene_g3_to_side4:
-      name: "👀 Scene Mode - Flip to Side 4 - Group 3 🍊"
+      name: "👀 Scene Mode - Flip to Side 4 - Group 3 🟤"
       icon: mdi:numeric-4-circle
       collapsed: true
       input:
@@ -851,7 +851,7 @@ blueprint:
             action: {}
 
     scene_g3_to_side5:
-      name: "👀 Scene Mode - Flip to Side 5 - Group 3 🍊"
+      name: "👀 Scene Mode - Flip to Side 5 - Group 3 🟤"
       icon: mdi:numeric-5-circle
       collapsed: true
       input:
@@ -882,7 +882,7 @@ blueprint:
             action: {}
 
     scene_g3_to_side6:
-      name: "👀 Scene Mode - Flip to Side 6 - Group 3 🍊"
+      name: "👀 Scene Mode - Flip to Side 6 - Group 3 🟤"
       icon: mdi:numeric-6-circle
       collapsed: true
       input:
@@ -914,7 +914,7 @@ blueprint:
 
     # Scene Mode - Group 4 (Unique Actions)
     scene_g4_unique:
-      name: "👀 Scene Mode - Unique Actions - Group 4 🍕"
+      name: "👀 Scene Mode - Unique Actions - Group 4 ⚪"
       icon: mdi:gesture
       collapsed: true
       input:
