@@ -1,15 +1,3 @@
-I'll analyze the YAML structure and correct any indentation issues. Let me go through this systematically:
-
-Looking at the structure, I can see several indentation problems that need to be fixed:
-
-1. The `input` section has incorrect nesting
-2. Some sections are missing proper indentation
-3. The `condition` section is incorrectly placed
-4. Some input blocks have mixed indentation
-
-Here's the corrected YAML:
-
-```yaml
 blueprint:
   name: Aqara Cube T1 Pro (CTP-R01)
   author: SirGoodenough
@@ -1709,4 +1697,3 @@ action:
     delay: 00:00:01
 mode: single
 max_exceeded: silent
-```
