@@ -8,11 +8,11 @@ blueprint:
     - 58+ unique commands (118+ total within modes)
     - Two operation modes: Action Mode and Scene Mode
 
-    **Action Groups:**
-    - ⭕ Group 1: Side-specific actions (36 action + 18 scene)
-    - ⭕ Group 2: Any-side actions (6 action + 3 scene)
-    - ⭕ Group 3: Side-to-side transitions (30 action + 30 scene)
-    - ⭕ Group 4: Mode-specific unique actions (5 total)
+    ⭕ **Action Groups:**
+    - Group 1: Side-specific actions (36 action + 18 scene)
+    - Group 2: Any-side actions (6 action + 3 scene)
+    - Group 3: Side-to-side transitions (30 action + 30 scene)
+    - Group 4: Mode-specific unique actions (5 total)
 
     ℹ️ **Important Notes:**
     - MQTT topic must contain only alphanumeric characters (A-Z, a-z, 0-9)
@@ -22,7 +22,7 @@ blueprint:
     - Example: `zigbee2mqtt/living_room_cube`
 
     ✍🏻 **Troubleshooting Template Error:**
-    If you see "TemplateError: Must provide a device or entity ID":
+     If you see "TemplateError: Must provide a device or entity ID":
      1. Open Zigbee2MQTT web UI
      2. Set the friendly_name to match your HA entity
      3. Enable "Update Home Assistant entity" option
