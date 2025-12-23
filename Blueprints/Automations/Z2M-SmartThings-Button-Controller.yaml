@@ -19,7 +19,6 @@ blueprint:
       selector:
         device:
           integration: mqtt
-          model: IM6001-BTP01
     single_press_actions:
       name: Actions for Single Press
       description: Actions to perform on single press.
