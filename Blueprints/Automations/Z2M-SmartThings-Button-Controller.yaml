@@ -1,0 +1,73 @@
+blueprint:
+  name: SmartThings Button Controller (Zigbee2MQTT)
+  description: |
+    Control actions for your Samsung SmartThings Button (IM6001-BTP01) via Zigbee2MQTT using the modern MQTT device triggers. Supports single press, double press, and hold.
+  author: "SpicyLimes"
+  source_url: https://github.com/SpicyLimes/Home-Assistant-Files/blob/main/Blueprints/Automations/Z2M-SmartThings-Button-Controller.yaml
+  domain: automation
+  input:
+    button_device:
+      name: SmartThings Button Device
+      description: Select the MQTT device for your SmartThings Button (found under Devices & Services > Devices > MQTT integration).
+      selector:
+        device:
+          integration: mqtt
+          manufacturer: Samsung Electronics
+          model: IM6001-BTP01
+    single_press_actions:
+      name: Actions for Single Press
+      description: Actions to perform on single press.
+      default: []
+      selector:
+        action: {}
+    double_press_actions:
+      name: Actions for Double Press
+      description: Actions to perform on double press.
+      default: []
+      selector:
+        action: {}
+    hold_actions:
+      name: Actions for Hold
+      description: Actions to perform on hold (long press).
+      default: []
+      selector:
+        action: {}
+
+trigger:
+  - platform: device
+    device_id: !input button_device
+    domain: mqtt
+    type: action
+    subtype: single
+    id: single
+  - platform: device
+    device_id: !input button_device
+    domain: mqtt
+    type: action
+    subtype: double
+    id: double
+  - platform: device
+    device_id: !input button_device
+    domain: mqtt
+    type: action
+    subtype: held
+    id: held
+
+condition: []
+
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: single
+        sequence: !input single_press_actions
+      - conditions:
+          - condition: trigger
+            id: double
+        sequence: !input double_press_actions
+      - conditions:
+          - condition: trigger
+            id: held
+        sequence: !input hold_actions
+
+mode: single
