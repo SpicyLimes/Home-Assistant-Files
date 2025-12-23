@@ -2,26 +2,26 @@ blueprint:
   name: Aqara Cube T1 Pro (CTP-R01)
   author: SirGoodenough (Remixed by SpicyLimes)
   description: |
-    Control your smart home with the Aqara Magic Cube T1 Pro via Zigbee2MQTT.
+    🧊 Control your smart home with the Aqara Magic Cube T1 Pro via Zigbee2MQTT.
     
-    **Features:**
+    🎉 **Features:**
     - 58+ unique commands (118+ total within modes)
     - Two operation modes: Action Mode and Scene Mode
 
     **Action Groups:**
-    - 🔴 Group 1: Side-specific actions (36 action + 18 scene)
-    - 🟠 Group 2: Any-side actions (6 action + 3 scene)
-    - 🟡 Group 3: Side-to-side transitions (30 action + 30 scene)
-    - 🟢 Group 4: Mode-specific unique actions (5 total)
+    - ⭕ Group 1: Side-specific actions (36 action + 18 scene)
+    - ⭕ Group 2: Any-side actions (6 action + 3 scene)
+    - ⭕ Group 3: Side-to-side transitions (30 action + 30 scene)
+    - ⭕ Group 4: Mode-specific unique actions (5 total)
 
-    **Important Notes:**
+    ℹ️ **Important Notes:**
     - MQTT topic must contain only alphanumeric characters (A-Z, a-z, 0-9)
     - Forward slashes (/) are allowed between device and topic
     - Ensure Z2M friendly_name matches HA entity name
     - No spaces or special characters except forward slash (/)
     - Example: `zigbee2mqtt/living_room_cube`
 
-    **Troubleshooting Template Error:**
+    ✍🏻 **Troubleshooting Template Error:**
     If you see "TemplateError: Must provide a device or entity ID":
      1. Open Zigbee2MQTT web UI
      2. Set the friendly_name to match your HA entity
@@ -31,10 +31,9 @@ blueprint:
      - Groups 1, 2, and 3 can trigger simultaneously. Choose one group per automation to avoid conflicts.
      - Group 4 Actions can be combined with any other group, however for simple actions, choose Group 2 and 4. If more actions/options are desired, use Groups 1 -OR- Group 3, and Group 4. 
     
-    [Documentation](https://github.com/SirGoodenough/HA_Blueprints/blob/master/Automations/Zigbee2MQTT%20-%20Xiaomi%20Cube%20Controller%20MQTT%20Triggered.md) | 
-    [Community Discussion](https://community.home-assistant.io/t/zigbee2mqtt-aqara-magic-cube-t1-pro-ctp-r01-xiaomi-lumi-cagl02/525111)
+    📝 [Documentation](https://github.com/SirGoodenough/HA_Blueprints/blob/master/Automations/Zigbee2MQTT%20-%20Xiaomi%20Cube%20Controller%20MQTT%20Triggered.md) | [Community Discussion](https://community.home-assistant.io/t/zigbee2mqtt-aqara-magic-cube-t1-pro-ctp-r01-xiaomi-lumi-cagl02/525111)
 
-  source_url: https://github.com/SirGoodenough/HA_Blueprints/blob/master/Automations/Zigbee2MQTT-Aqara-Magic-Cube-T1-Pro-CTP-R01-Xiaomi-Lumi.yaml
+  source_url: https://github.com/SpicyLimes/Home-Assistant-Files/edit/main/Blueprints/Automations/Z2M-Aqara-Cube-T1-Pro-Controller.yaml
   domain: automation
   homeassistant:
     min_version: 2024.6.0
@@ -42,15 +41,15 @@ blueprint:
   input:
     # Required Configuration
     required_settings:
-      name: "⚙️ Required Settings"
+      name: "Required Settings"
       icon: mdi:cog-outline
       collapsed: false
       description: "Add your Device's MQTT Topic below - review important notes above for formatting information!"
       input:
         mqtt_topic:
           name: MQTT Topic
-          description: The MQTT topic for your cube (e.g., zigbee2mqtt/cube_name)
-          default: zigbee2mqtt/?
+          description: The MQTT topic for your Device (e.g., zigbee2mqtt/cube_name)
+          default: zigbee2mqtt/
           selector:
             text:
               multiline: false
