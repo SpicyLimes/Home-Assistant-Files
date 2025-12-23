@@ -1,0 +1,83 @@
+blueprint:
+  name: Aqara Button Controller (Zigbee2MQTT)
+  description: |
+    Control actions for your Aqara Button via Zigbee2MQTT using the modern MQTT device triggers.
+    
+    This blueprint supports the standard actions exposed by Zigbee2MQTT:
+    - Single Press
+    - Double Press
+    - Hold (Long Press)
+    - Release (After Long Press)
+    
+    Note: Ensure your device exposes all these actions in Zigbee2MQTT.
+  author: "SpicyLimes"
+  source_url: https://github.com/SpicyLimes/Home-Assistant-Files/blob/main/Blueprints/Automations/Z2M-Aqara-Button-Controller.yaml
+  domain: automation
+  input:
+    button_device:
+      name: Aqara Button Device
+      description: Select the MQTT device for your Aqara Button (found under Devices & Services > Devices > MQTT integration).
+      selector:
+        device:
+          filter: 
+            integration: mqtt
+            model_id: WXKG11LM
+
+    single_press_actions:
+      name: Actions for Single Press
+      description: Actions to perform on single press.
+      default: []
+      selector:
+        action: {}
+    double_press_actions:
+      name: Actions for Double Press
+      description: Actions to perform on double press.
+      default: []
+      selector:
+        action: {}
+    hold_actions:
+      name: Actions for Hold
+      description: Actions to perform on hold (long press).
+      default: []
+      selector:
+        action: {}
+
+trigger:
+  - platform: device
+    device_id: !input button_device
+    domain: mqtt
+    type: action
+    subtype: single
+    id: single
+  - platform: device
+    device_id: !input button_device
+    domain: mqtt
+    type: action
+    subtype: double
+    id: double
+  - platform: device
+    device_id: !input button_device
+    domain: mqtt
+    type: action
+    subtype: hold
+    id: hold
+
+condition: []
+
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: single
+        sequence: !input single_press_actions
+      - conditions:
+          - condition: trigger
+            id: double
+        sequence: !input double_press_actions
+      - conditions:
+          - condition: trigger
+            id: hold
+        sequence: !input hold_actions
+
+mode: restart
+max_exceeded: silent
