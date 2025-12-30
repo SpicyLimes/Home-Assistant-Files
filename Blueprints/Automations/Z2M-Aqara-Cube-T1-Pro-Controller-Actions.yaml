@@ -33,7 +33,7 @@ blueprint:
     
     📝 [Documentation](https://github.com/SirGoodenough/HA_Blueprints/blob/master/Automations/Zigbee2MQTT%20-%20Xiaomi%20Cube%20Controller%20MQTT%20Triggered.md) | [Community Discussion](https://community.home-assistant.io/t/zigbee2mqtt-aqara-magic-cube-t1-pro-ctp-r01-xiaomi-lumi-cagl02/525111)
 
-  source_url: https://github.com/SpicyLimes/Home-Assistant-Files/edit/main/Blueprints/Automations/Z2M-Aqara-Cube-T1-Pro-Controller.yaml
+  source_url: https://github.com/SpicyLimes/Home-Assistant-Files/edit/main/Blueprints/Automations/Z2M-Aqara-Cube-T1-Pro-Controller-Actions.yaml
   domain: automation
   homeassistant:
     min_version: 2024.6.0
