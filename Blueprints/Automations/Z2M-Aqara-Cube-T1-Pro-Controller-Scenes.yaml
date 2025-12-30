@@ -1,0 +1,699 @@
+blueprint:
+  name: Aqara Cube T1 Pro - Scene Mode ONLY (CTP-R01)
+  author: SirGoodenough (Remixed by SpicyLimes)
+  description: |
+    🧊 Control your smart home with the Aqara Magic Cube T1 Pro via Zigbee2MQTT.
+    
+    🎉 **Features:**
+    - 58+ unique commands (118+ total within modes)
+    - Two operation modes: Action Mode and Scene Mode
+
+    ⭕ **Action Groups:**
+    - Group 1: Side-specific actions (36 action + 18 scene)
+    - Group 2: Any-side actions (6 action + 3 scene)
+    - Group 3: Side-to-side transitions (30 action + 30 scene)
+    - Group 4: Mode-specific unique actions (5 total)
+
+    ℹ️ **Important Notes:**
+    - MQTT topic must contain only alphanumeric characters (A-Z, a-z, 0-9)
+    - Forward slashes (/) are allowed between device and topic
+    - Ensure Z2M friendly_name matches HA entity name
+    - No spaces or special characters except forward slash (/)
+    - Example: `zigbee2mqtt/living_room_cube`
+
+    ✍🏻 **Troubleshooting Template Error:**
+     If you see "TemplateError: Must provide a device or entity ID":
+     1. Open Zigbee2MQTT web UI
+     2. Set the friendly_name to match your HA entity
+     3. Enable "Update Home Assistant entity" option
+
+    ⚠️ **Warning:** 
+     - Groups 1, 2, and 3 can trigger simultaneously. Choose one group per automation to avoid conflicts.
+     - Group 4 Actions can be combined with any other group, however for simple actions, choose Group 2 and 4. If more actions/options are desired, use Groups 1 -OR- Group 3, and Group 4. 
+    
+    📝 [Documentation](https://github.com/SirGoodenough/HA_Blueprints/blob/master/Automations/Zigbee2MQTT%20-%20Xiaomi%20Cube%20Controller%20MQTT%20Triggered.md) | [Community Discussion](https://community.home-assistant.io/t/zigbee2mqtt-aqara-magic-cube-t1-pro-ctp-r01-xiaomi-lumi-cagl02/525111)
+
+  source_url: https://github.com/SpicyLimes/Home-Assistant-Files/edit/main/Blueprints/Automations/Z2M-Aqara-Cube-T1-Pro-Controller.yaml
+  domain: automation
+  homeassistant:
+    min_version: 2024.6.0
+
+  input:
+    # Required Configuration
+    required_settings:
+      name: "Required Settings"
+      icon: mdi:cog-outline
+      collapsed: false
+      description: "Add your Device's MQTT Topic below - review important notes above for formatting information!"
+      input:
+        mqtt_topic:
+          name: MQTT Topic
+          description: The MQTT topic for your Device (e.g., zigbee2mqtt/cube_name)
+          default: zigbee2mqtt/
+          selector:
+            text:
+              multiline: false
+
+    # Optional Conditions
+    conditions:
+      name: "🔧 Optional Conditions"
+      icon: mdi:filter-variant
+      collapsed: true
+      description: Add time-based or state-based conditions to control when this automation runs
+      input:
+        extra_conditions:
+          name: Additional Conditions
+          description: Optional conditions (e.g., time of day, home occupancy)
+          default: []
+          selector:
+            condition:
+
+    # Scene Mode - Group 1 (Side-Specific)
+    scene_g1_side1:
+      name: "👀 Scene Mode - Side 1 (Aqara Logo) - Group 1 🔵"
+      icon: mdi:numeric-1-box
+      collapsed: true
+      input:
+        scn_s1_flip:
+          name: Flip to Face 1 (Any Origin)
+          default: []
+          selector:
+            action: {}
+        scn_s1_rotate_cw:
+          name: Rotate Clockwise (Face 1)
+          default: []
+          selector:
+            action: {}
+        scn_s1_rotate_ccw:
+          name: Rotate Counter-Clockwise (Face 1)
+          default: []
+          selector:
+            action: {}
+
+    scene_g1_side2:
+      name: "👀 Scene Mode - Side 2 - Group 1 🔵"
+      icon: mdi:numeric-2-box
+      collapsed: true
+      input:
+        scn_s2_flip:
+          name: Flip to Face 2 (Any Origin)
+          default: []
+          selector:
+            action: {}
+        scn_s2_rotate_cw:
+          name: Rotate Clockwise (Face 2)
+          default: []
+          selector:
+            action: {}
+        scn_s2_rotate_ccw:
+          name: Rotate Counter-Clockwise (Face 2)
+          default: []
+          selector:
+            action: {}
+
+    scene_g1_side3:
+      name: "👀 Scene Mode - Side 3 - Group 1 🔵"
+      icon: mdi:numeric-3-box
+      collapsed: true
+      input:
+        scn_s3_flip:
+          name: Flip to Face 3 (Any Origin)
+          default: []
+          selector:
+            action: {}
+        scn_s3_rotate_cw:
+          name: Rotate Clockwise (Face 3)
+          default: []
+          selector:
+            action: {}
+        scn_s3_rotate_ccw:
+          name: Rotate Counter-Clockwise (Face 3)
+          default: []
+          selector:
+            action: {}
+
+    scene_g1_side4:
+      name: "👀 Scene Mode - Side 4 - Group 1 🔵"
+      icon: mdi:numeric-4-box
+      collapsed: true
+      input:
+        scn_s4_flip:
+          name: Flip to Face 4 (Any Origin)
+          default: []
+          selector:
+            action: {}
+        scn_s4_rotate_cw:
+          name: Rotate Clockwise (Face 4)
+          default: []
+          selector:
+            action: {}
+        scn_s4_rotate_ccw:
+          name: Rotate Counter-Clockwise (Face 4)
+          default: []
+          selector:
+            action: {}
+
+    scene_g1_side5:
+      name: "👀 Scene Mode - Side 5 - Group 1 🔵"
+      icon: mdi:numeric-5-box
+      collapsed: true
+      input:
+        scn_s5_flip:
+          name: Flip to Face 5 (Any Origin)
+          default: []
+          selector:
+            action: {}
+        scn_s5_rotate_cw:
+          name: Rotate Clockwise (Face 5)
+          default: []
+          selector:
+            action: {}
+        scn_s5_rotate_ccw:
+          name: Rotate Counter-Clockwise (Face 5)
+          default: []
+          selector:
+            action: {}
+
+    scene_g1_side6:
+      name: "👀 Scene Mode - Side 6 - Group 1 🔵"
+      icon: mdi:numeric-6-box
+      collapsed: true
+      input:
+        scn_s6_flip:
+          name: Flip to Face 6 (Any Origin)
+          default: []
+          selector:
+            action: {}
+        scn_s6_rotate_cw:
+          name: Rotate Clockwise (Face 6)
+          default: []
+          selector:
+            action: {}
+        scn_s6_rotate_ccw:
+          name: Rotate Counter-Clockwise (Face 6)
+          default: []
+          selector:
+            action: {}
+
+    # Scene Mode - Group 2 (Any Side)
+    scene_g2_any:
+      name: "👀 Scene Mode - Any Side - Group 2 🟣"
+      icon: mdi:cube-outline
+      collapsed: true
+      description: |
+        ⚠️ **Warning:** These actions also trigger Group 1 and Group 3 actions.
+      input:
+        scn_any_flip:
+          name: Flip to Any Side
+          default: []
+          selector:
+            action: {}
+        scn_any_rotate_cw:
+          name: Rotate Clockwise (Any Side)
+          default: []
+          selector:
+            action: {}
+        scn_any_rotate_ccw:
+          name: Rotate Counter-Clockwise (Any Side)
+          default: []
+          selector:
+            action: {}
+
+    # Scene Mode - Group 3 (Side Transitions)
+    scene_g3_to_side1:
+      name: "👀 Scene Mode - Flip to Side 1 - Group 3 🟤"
+      icon: mdi:numeric-1-circle
+      collapsed: true
+      input:
+        scn_1from2:
+          name: Flip to Side 1 from Side 2
+          default: []
+          selector:
+            action: {}
+        scn_1from3:
+          name: Flip to Side 1 from Side 3
+          default: []
+          selector:
+            action: {}
+        scn_1from4:
+          name: Flip to Side 1 from Side 4
+          default: []
+          selector:
+            action: {}
+        scn_1from5:
+          name: Flip to Side 1 from Side 5
+          default: []
+          selector:
+            action: {}
+        scn_1from6:
+          name: Flip to Side 1 from Side 6
+          default: []
+          selector:
+            action: {}
+
+    scene_g3_to_side2:
+      name: "👀 Scene Mode - Flip to Side 2 - Group 3 🟤"
+      icon: mdi:numeric-2-circle
+      collapsed: true
+      input:
+        scn_2from1:
+          name: Flip to Side 2 from Side 1
+          default: []
+          selector:
+            action: {}
+        scn_2from3:
+          name: Flip to Side 2 from Side 3
+          default: []
+          selector:
+            action: {}
+        scn_2from4:
+          name: Flip to Side 2 from Side 4
+          default: []
+          selector:
+            action: {}
+        scn_2from5:
+          name: Flip to Side 2 from Side 5
+          default: []
+          selector:
+            action: {}
+        scn_2from6:
+          name: Flip to Side 2 from Side 6
+          default: []
+          selector:
+            action: {}
+
+    scene_g3_to_side3:
+      name: "👀 Scene Mode - Flip to Side 3 - Group 3 🟤"
+      icon: mdi:numeric-3-circle
+      collapsed: true
+      input:
+        scn_3from1:
+          name: Flip to Side 3 from Side 1
+          default: []
+          selector:
+            action: {}
+        scn_3from2:
+          name: Flip to Side 3 from Side 2
+          default: []
+          selector:
+            action: {}
+        scn_3from4:
+          name: Flip to Side 3 from Side 4
+          default: []
+          selector:
+            action: {}
+        scn_3from5:
+          name: Flip to Side 3 from Side 5
+          default: []
+          selector:
+            action: {}
+        scn_3from6:
+          name: Flip to Side 3 from Side 6
+          default: []
+          selector:
+            action: {}
+
+    scene_g3_to_side4:
+      name: "👀 Scene Mode - Flip to Side 4 - Group 3 🟤"
+      icon: mdi:numeric-4-circle
+      collapsed: true
+      input:
+        scn_4from1:
+          name: Flip to Side 4 from Side 1
+          default: []
+          selector:
+            action: {}
+        scn_4from2:
+          name: Flip to Side 4 from Side 2
+          default: []
+          selector:
+            action: {}
+        scn_4from3:
+          name: Flip to Side 4 from Side 3
+          default: []
+          selector:
+            action: {}
+        scn_4from5:
+          name: Flip to Side 4 from Side 5
+          default: []
+          selector:
+            action: {}
+        scn_4from6:
+          name: Flip to Side 4 from Side 6
+          default: []
+          selector:
+            action: {}
+
+    scene_g3_to_side5:
+      name: "👀 Scene Mode - Flip to Side 5 - Group 3 🟤"
+      icon: mdi:numeric-5-circle
+      collapsed: true
+      input:
+        scn_5from1:
+          name: Flip to Side 5 from Side 1
+          default: []
+          selector:
+            action: {}
+        scn_5from2:
+          name: Flip to Side 5 from Side 2
+          default: []
+          selector:
+            action: {}
+        scn_5from3:
+          name: Flip to Side 5 from Side 3
+          default: []
+          selector:
+            action: {}
+        scn_5from4:
+          name: Flip to Side 5 from Side 4
+          default: []
+          selector:
+            action: {}
+        scn_5from6:
+          name: Flip to Side 5 from Side 6
+          default: []
+          selector:
+            action: {}
+
+    scene_g3_to_side6:
+      name: "👀 Scene Mode - Flip to Side 6 - Group 3 🟤"
+      icon: mdi:numeric-6-circle
+      collapsed: true
+      input:
+        scn_6from1:
+          name: Flip to Side 6 from Side 1
+          default: []
+          selector:
+            action: {}
+        scn_6from2:
+          name: Flip to Side 6 from Side 2
+          default: []
+          selector:
+            action: {}
+        scn_6from3:
+          name: Flip to Side 6 from Side 3
+          default: []
+          selector:
+            action: {}
+        scn_6from4:
+          name: Flip to Side 6 from Side 4
+          default: []
+          selector:
+            action: {}
+        scn_6from5:
+          name: Flip to Side 6 from Side 5
+          default: []
+          selector:
+            action: {}
+
+    # Scene Mode - Group 4 (Unique Actions)
+    scene_g4_unique:
+      name: "👀 Scene Mode - Unique Actions - Group 4 ⚪"
+      icon: mdi:gesture
+      collapsed: true
+      input:
+        scn_hold:
+          name: Hold Cube
+          description: Lift and hold the cube still
+          default: []
+          selector:
+            action: {}
+        scn_shake:
+          name: Shake Cube
+          default: []
+          selector:
+            action: {}
+        scn_throw:
+          name: Throw Gesture
+          description: Pick up → throwing motion → hold (don't actually throw!)
+          default: []
+          selector:
+            action: {}
+
+# Trigger
+trigger:
+  - platform: mqtt
+    topic: !input mqtt_topic
+
+# Variables
+variables:
+  # Parse trigger payload
+  action: >-
+    {{ trigger.payload_json.action | default('none') }}
+  angle: >-
+    {{ trigger.payload_json.action_angle | float(0.0) }}
+  side: >-
+    {{ trigger.payload_json.side | int(0) }}
+  op_mode: >-
+    {{ trigger.payload_json.operation_mode | default('none') }}
+  
+  # Extract device identifiers
+  topic_var: !input mqtt_topic
+  friendly_name: >-
+    {{ topic_var.split('/')[1] | regex_replace('[^A-Za-z0-9_/./-]', '') }}
+  device_id: >-
+    {{ device_id(friendly_name) }}
+  ieee_id: >-
+    {{ (device_attr(device_id, 'identifiers') | list)[0][1].split('_')[1] }}
+  
+  # Number helper entity for last_side tracking
+  num_entity_id: >-
+    {{ 'number.' ~ friendly_name ~ '_last_side' }}
+  last_side: >-
+    {% set val = states(num_entity_id) | default(0) %}
+    {% if val not in ['undefined', 'unknown', 'unavailable', 'none', 'null', ''] %}
+      {{ val | int(0) }}
+    {% else %}
+      0
+    {% endif %}
+  
+  # MQTT configuration topics
+  config_topic: >-
+    homeassistant/number/{{ ieee_id }}/last_side/config
+  state_topic: >-
+    homeassistant/number/{{ ieee_id }}/last_side
+
+# Conditions
+condition:
+  - condition: or
+    conditions:
+      - condition: template
+        alias: Valid Scene Mode trigger
+        value_template: >-
+          {{ trigger.payload_json is defined
+             and trigger.payload_json.operation_mode == 'scene_mode'
+             and trigger.payload_json.action in 
+                 ['rotate_right', 'rotate_left', 'flip_to_side', 
+                  'shake', 'throw', 'hold'] }}
+  - condition: !input extra_conditions
+
+# Actions
+action:
+  # Create/update number helper via MQTT discovery
+  - alias: Configure last_side number helper
+    service: mqtt.publish
+    data:
+      topic: "{{ config_topic }}"
+      retain: true
+      payload: >-
+        {
+          "name": "last side",
+          "avty_t": "homeassistant/status",
+          "uniq_id": "{{ friendly_name }}-{{ device_id }}",
+          "cmd_t": "{{ state_topic }}",
+          "sta_t": "{{ state_topic }}",
+          "min": 0,
+          "max": 6,
+          "step": 1,
+          "mode": "box",
+          "ret": true,
+          "dev": {
+            "name": "{{ friendly_name }}",
+            "mdl": "Aqara Magic Cube T1 Pro Controller",
+            "mf": "SirGoodenough",
+            "sw": "2024-06-04",
+            "hw": "https://github.com/SirGoodenough/HA_Blueprints",
+            "ids": ["{{ ieee_id }}-last_side"]
+          }
+        }
+
+  # Fire diagnostic event
+  - alias: Publish cube action event
+    event: cube_last_action
+    event_data:
+      action: "{{ action }}"
+      side: "{{ side }}"
+      last_side: "{{ last_side }}"
+      friendly_name: "{{ friendly_name }}"
+      device_id: "{{ device_id }}"
+      ieee_id: "{{ ieee_id }}"
+      angle: "{{ angle }}"
+      mode: "{{ op_mode }}"
+
+  # Update last_side state
+  - alias: Store current side as last_side
+    service: number.set_value
+    target:
+      entity_id: "{{ num_entity_id }}"
+    data:
+      value: "{{ side }}"
+
+  # Mode-specific action handlers
+  - alias: Route to mode handler
+    choose:
+      # === SCENE MODE ===
+      - conditions: "{{ op_mode == 'scene_mode' }}"
+        sequence:
+          # Group 2 & 4: Any-side and unique actions
+          - alias: Handle any-side and unique actions
+            choose:
+              - conditions: "{{ action == 'flip_to_side' }}"
+                sequence: !input scn_any_flip
+              - conditions: "{{ action == 'rotate_right' }}"
+                sequence: !input scn_any_rotate_cw
+              - conditions: "{{ action == 'rotate_left' }}"
+                sequence: !input scn_any_rotate_ccw
+              - conditions: "{{ action == 'hold' }}"
+                sequence: !input scn_hold
+              - conditions: "{{ action == 'shake' }}"
+                sequence: !input scn_shake
+              - conditions: "{{ action == 'throw' }}"
+                sequence: !input scn_throw
+
+          # Group 1: Side-specific actions
+          - alias: Handle side-specific actions
+            choose:
+              - conditions: "{{ action == 'flip_to_side' }}"
+                sequence:
+                  - choose:
+                      - conditions: "{{ side == 1 }}"
+                        sequence: !input scn_s1_flip
+                      - conditions: "{{ side == 2 }}"
+                        sequence: !input scn_s2_flip
+                      - conditions: "{{ side == 3 }}"
+                        sequence: !input scn_s3_flip
+                      - conditions: "{{ side == 4 }}"
+                        sequence: !input scn_s4_flip
+                      - conditions: "{{ side == 5 }}"
+                        sequence: !input scn_s5_flip
+                      - conditions: "{{ side == 6 }}"
+                        sequence: !input scn_s6_flip
+              - conditions: "{{ action == 'rotate_right' }}"
+                sequence:
+                  - choose:
+                      - conditions: "{{ side == 1 }}"
+                        sequence: !input scn_s1_rotate_cw
+                      - conditions: "{{ side == 2 }}"
+                        sequence: !input scn_s2_rotate_cw
+                      - conditions: "{{ side == 3 }}"
+                        sequence: !input scn_s3_rotate_cw
+                      - conditions: "{{ side == 4 }}"
+                        sequence: !input scn_s4_rotate_cw
+                      - conditions: "{{ side == 5 }}"
+                        sequence: !input scn_s5_rotate_cw
+                      - conditions: "{{ side == 6 }}"
+                        sequence: !input scn_s6_rotate_cw
+              - conditions: "{{ action == 'rotate_left' }}"
+                sequence:
+                  - choose:
+                      - conditions: "{{ side == 1 }}"
+                        sequence: !input scn_s1_rotate_ccw
+                      - conditions: "{{ side == 2 }}"
+                        sequence: !input scn_s2_rotate_ccw
+                      - conditions: "{{ side == 3 }}"
+                        sequence: !input scn_s3_rotate_ccw
+                      - conditions: "{{ side == 4 }}"
+                        sequence: !input scn_s4_rotate_ccw
+                      - conditions: "{{ side == 5 }}"
+                        sequence: !input scn_s5_rotate_ccw
+                      - conditions: "{{ side == 6 }}"
+                        sequence: !input scn_s6_rotate_ccw
+
+          # Group 3: Side-to-side transitions
+          - alias: Handle side transition actions
+            choose:
+              - conditions: "{{ side == 1 }}"
+                sequence:
+                  - choose:
+                      - conditions: "{{ last_side == 2 }}"
+                        sequence: !input scn_1from2
+                      - conditions: "{{ last_side == 3 }}"
+                        sequence: !input scn_1from3
+                      - conditions: "{{ last_side == 4 }}"
+                        sequence: !input scn_1from4
+                      - conditions: "{{ last_side == 5 }}"
+                        sequence: !input scn_1from5
+                      - conditions: "{{ last_side == 6 }}"
+                        sequence: !input scn_1from6
+              - conditions: "{{ side == 2 }}"
+                sequence:
+                  - choose:
+                      - conditions: "{{ last_side == 1 }}"
+                        sequence: !input scn_2from1
+                      - conditions: "{{ last_side == 3 }}"
+                        sequence: !input scn_2from3
+                      - conditions: "{{ last_side == 4 }}"
+                        sequence: !input scn_2from4
+                      - conditions: "{{ last_side == 5 }}"
+                        sequence: !input scn_2from5
+                      - conditions: "{{ last_side == 6 }}"
+                        sequence: !input scn_2from6
+              - conditions: "{{ side == 3 }}"
+                sequence:
+                  - choose:
+                      - conditions: "{{ last_side == 1 }}"
+                        sequence: !input scn_3from1
+                      - conditions: "{{ last_side == 2 }}"
+                        sequence: !input scn_3from2
+                      - conditions: "{{ last_side == 4 }}"
+                        sequence: !input scn_3from4
+                      - conditions: "{{ last_side == 5 }}"
+                        sequence: !input scn_3from5
+                      - conditions: "{{ last_side == 6 }}"
+                        sequence: !input scn_3from6
+              - conditions: "{{ side == 4 }}"
+                sequence:
+                  - choose:
+                      - conditions: "{{ last_side == 1 }}"
+                        sequence: !input scn_4from1
+                      - conditions: "{{ last_side == 2 }}"
+                        sequence: !input scn_4from2
+                      - conditions: "{{ last_side == 3 }}"
+                        sequence: !input scn_4from3
+                      - conditions: "{{ last_side == 5 }}"
+                        sequence: !input scn_4from5
+                      - conditions: "{{ last_side == 6 }}"
+                        sequence: !input scn_4from6
+              - conditions: "{{ side == 5 }}"
+                sequence:
+                  - choose:
+                      - conditions: "{{ last_side == 1 }}"
+                        sequence: !input scn_5from1
+                      - conditions: "{{ last_side == 2 }}"
+                        sequence: !input scn_5from2
+                      - conditions: "{{ last_side == 3 }}"
+                        sequence: !input scn_5from3
+                      - conditions: "{{ last_side == 4 }}"
+                        sequence: !input scn_5from4
+                      - conditions: "{{ last_side == 6 }}"
+                        sequence: !input scn_5from6
+              - conditions: "{{ side == 6 }}"
+                sequence:
+                  - choose:
+                      - conditions: "{{ last_side == 1 }}"
+                        sequence: !input scn_6from1
+                      - conditions: "{{ last_side == 2 }}"
+                        sequence: !input scn_6from2
+                      - conditions: "{{ last_side == 3 }}"
+                        sequence: !input scn_6from3
+                      - conditions: "{{ last_side == 4 }}"
+                        sequence: !input scn_6from4
+                      - conditions: "{{ last_side == 5 }}"
+                        sequence: !input scn_6from5
+
+  # Debounce delay for toggle functions
+  - alias: Debounce delay
+    delay: "00:00:01"
+
+mode: single
+max_exceeded: silent
