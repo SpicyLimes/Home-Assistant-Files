@@ -11,7 +11,6 @@ blueprint:
       selector:
         entity:
           domain: binary_sensor
-          device_class: motion
     light_entity:
       name: Light
       description: The light entity to control (e.g., LED Strip).
