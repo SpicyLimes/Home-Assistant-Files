@@ -1,0 +1,360 @@
+blueprint:
+  name: "Adaptive Motion-Activated Light (AML)"
+  author: "SpicyLimes"
+  description: "Trigger a light on motion with 3 different time slots for Color and Brightness settings. Each slot can be enabled or disabled."
+  source_url: https://github.com/SpicyLimes/Home-Assistant-Files/blob/main/Blueprints/Automations/Motion_Light_Time_Slots.yaml
+  domain: automation
+  input:
+    motion_entity:
+      name: Motion Sensor
+      description: The motion sensor that triggers the light.
+      selector:
+        entity:
+          domain: binary_sensor
+          device_class: motion
+    light_entity:
+      name: Light
+      description: The light entity to control (e.g., LED Strip).
+      selector:
+        entity:
+          domain: light
+    no_motion_wait:
+      name: Wait Time
+      description: Time to wait after motion stops before turning off the light.
+      default: 120
+      selector:
+        number:
+          min: 0
+          max: 3600
+          unit_of_measurement: seconds
+          mode: slider
+    
+    # Section 1
+    slot_1_header:
+      name: "--- TIME SLOT 1 ---"
+      description: "First time period settings."
+      default: "Morning"
+      selector:
+        text: 
+          multiline: false
+    slot_1_enabled:
+      name: "Slot 1: Enabled"
+      description: "Enable or disable this time slot."
+      default: true
+      selector:
+        boolean: {}
+    slot_1_start:
+      name: "Slot 1: Start Time"
+      default: "00:00:00"
+      selector:
+        time: {}
+    slot_1_end:
+      name: "Slot 1: End Time"
+      default: "08:00:00"
+      selector:
+        time: {}
+    slot_1_brightness:
+      name: "Slot 1: Brightness"
+      default: 50
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: "%"
+          mode: slider
+    slot_1_color:
+      name: "Slot 1: Color"
+      default: "Don't Change"
+      selector:
+        select:
+          options:
+            - "Don't Change"
+            - "Warm White"
+            - "Cool White"
+            - "Red"
+            - "Green"
+            - "Blue"
+            - "Light Blue"
+            - "Purple"
+            - "Orange"
+            - "Yellow"
+            - "Cyan"
+            - "Magenta"
+            - "White"
+
+    # Section 2
+    slot_2_header:
+      name: "--- TIME SLOT 2 ---"
+      description: "Second time period settings."
+      default: "Day"
+      selector:
+        text: 
+          multiline: false
+    slot_2_enabled:
+      name: "Slot 2: Enabled"
+      description: "Enable or disable this time slot."
+      default: true
+      selector:
+        boolean: {}
+    slot_2_start:
+      name: "Slot 2: Start Time"
+      default: "08:00:00"
+      selector:
+        time: {}
+    slot_2_end:
+      name: "Slot 2: End Time"
+      default: "20:00:00"
+      selector:
+        time: {}
+    slot_2_brightness:
+      name: "Slot 2: Brightness"
+      default: 100
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: "%"
+          mode: slider
+    slot_2_color:
+      name: "Slot 2: Color"
+      default: "Don't Change"
+      selector:
+        select:
+          options:
+            - "Don't Change"
+            - "Warm White"
+            - "Cool White"
+            - "Red"
+            - "Green"
+            - "Blue"
+            - "Light Blue"
+            - "Purple"
+            - "Orange"
+            - "Yellow"
+            - "Cyan"
+            - "Magenta"
+            - "White"
+
+    # Section 3
+    slot_3_header:
+      name: "--- TIME SLOT 3 ---"
+      description: "Third time period settings."
+      default: "Evening"
+      selector:
+        text: 
+          multiline: false
+    slot_3_enabled:
+      name: "Slot 3: Enabled"
+      description: "Enable or disable this time slot."
+      default: true
+      selector:
+        boolean: {}
+    slot_3_start:
+      name: "Slot 3: Start Time"
+      default: "20:00:00"
+      selector:
+        time: {}
+    slot_3_end:
+      name: "Slot 3: End Time"
+      default: "00:00:00"
+      selector:
+        time: {}
+    slot_3_brightness:
+      name: "Slot 3: Brightness"
+      default: 25
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: "%"
+          mode: slider
+    slot_3_color:
+      name: "Slot 3: Color"
+      default: "Don't Change"
+      selector:
+        select:
+          options:
+            - "Don't Change"
+            - "Warm White"
+            - "Cool White"
+            - "Red"
+            - "Green"
+            - "Blue"
+            - "Light Blue"
+            - "Purple"
+            - "Orange"
+            - "Yellow"
+            - "Cyan"
+            - "Magenta"
+            - "White"
+
+mode: restart
+max_exceeded: silent
+
+variables:
+  light_entity: !input light_entity
+  
+  # Slot 1
+  s1_enabled: !input slot_1_enabled
+  s1_brightness: !input slot_1_brightness
+  s1_color: !input slot_1_color
+  s1_rgb: >
+    {% if s1_color == 'Warm White' %} [255, 244, 229]
+    {% elif s1_color == 'Cool White' %} [230, 240, 255]
+    {% elif s1_color == 'Red' %} [255, 0, 0]
+    {% elif s1_color == 'Green' %} [0, 255, 0]
+    {% elif s1_color == 'Blue' %} [0, 0, 255]
+    {% elif s1_color == 'Light Blue' %} [173, 216, 230]
+    {% elif s1_color == 'Purple' %} [128, 0, 128]
+    {% elif s1_color == 'Orange' %} [255, 165, 0]
+    {% elif s1_color == 'Yellow' %} [255, 255, 0]
+    {% elif s1_color == 'Cyan' %} [0, 255, 255]
+    {% elif s1_color == 'Magenta' %} [255, 0, 255]
+    {% elif s1_color == 'White' %} [255, 255, 255]
+    {% else %} [] {% endif %}
+
+  # Slot 2
+  s2_enabled: !input slot_2_enabled
+  s2_brightness: !input slot_2_brightness
+  s2_color: !input slot_2_color
+  s2_rgb: >
+    {% if s2_color == 'Warm White' %} [255, 244, 229]
+    {% elif s2_color == 'Cool White' %} [230, 240, 255]
+    {% elif s2_color == 'Red' %} [255, 0, 0]
+    {% elif s2_color == 'Green' %} [0, 255, 0]
+    {% elif s2_color == 'Blue' %} [0, 0, 255]
+    {% elif s2_color == 'Light Blue' %} [173, 216, 230]
+    {% elif s2_color == 'Purple' %} [128, 0, 128]
+    {% elif s2_color == 'Orange' %} [255, 165, 0]
+    {% elif s2_color == 'Yellow' %} [255, 255, 0]
+    {% elif s2_color == 'Cyan' %} [0, 255, 255]
+    {% elif s2_color == 'Magenta' %} [255, 0, 255]
+    {% elif s2_color == 'White' %} [255, 255, 255]
+    {% else %} [] {% endif %}
+
+  # Slot 3
+  s3_enabled: !input slot_3_enabled
+  s3_brightness: !input slot_3_brightness
+  s3_color: !input slot_3_color
+  s3_rgb: >
+    {% if s3_color == 'Warm White' %} [255, 244, 229]
+    {% elif s3_color == 'Cool White' %} [230, 240, 255]
+    {% elif s3_color == 'Red' %} [255, 0, 0]
+    {% elif s3_color == 'Green' %} [0, 255, 0]
+    {% elif s3_color == 'Blue' %} [0, 0, 255]
+    {% elif s3_color == 'Light Blue' %} [173, 216, 230]
+    {% elif s3_color == 'Purple' %} [128, 0, 128]
+    {% elif s3_color == 'Orange' %} [255, 165, 0]
+    {% elif s3_color == 'Yellow' %} [255, 255, 0]
+    {% elif s3_color == 'Cyan' %} [0, 255, 255]
+    {% elif s3_color == 'Magenta' %} [255, 0, 255]
+    {% elif s3_color == 'White' %} [255, 255, 255]
+    {% else %} [] {% endif %}
+
+trigger:
+  - platform: state
+    entity_id: !input motion_entity
+    from: "off"
+    to: "on"
+  - platform: state
+    entity_id: !input motion_entity
+    from: "on"
+    to: "off"
+    for: !input no_motion_wait
+
+action:
+  - choose:
+      # If triggered by motion ON
+      - conditions:
+          - condition: state
+            entity_id: !input motion_entity
+            state: "on"
+        sequence:
+          - choose:
+              # Slot 1
+              - conditions:
+                  - condition: template
+                    value_template: "{{ s1_enabled }}"
+                  - condition: time
+                    after: !input slot_1_start
+                    before: !input slot_1_end
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ s1_rgb != '[]' }}"
+                        sequence:
+                          - service: light.turn_on
+                            target:
+                               entity_id: !input light_entity
+                            data:
+                               brightness_pct: "{{ s1_brightness }}"
+                               rgb_color: "{{ s1_rgb }}"
+                      default:
+                        - service: light.turn_on
+                          target:
+                             entity_id: !input light_entity
+                          data:
+                             brightness_pct: "{{ s1_brightness }}"
+
+              # Slot 2
+              - conditions:
+                  - condition: template
+                    value_template: "{{ s2_enabled }}"
+                  - condition: time
+                    after: !input slot_2_start
+                    before: !input slot_2_end
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ s2_rgb != '[]' }}"
+                        sequence:
+                          - service: light.turn_on
+                            target:
+                               entity_id: !input light_entity
+                            data:
+                               brightness_pct: "{{ s2_brightness }}"
+                               rgb_color: "{{ s2_rgb }}"
+                      default:
+                        - service: light.turn_on
+                          target:
+                             entity_id: !input light_entity
+                          data:
+                             brightness_pct: "{{ s2_brightness }}"
+
+              # Slot 3
+              - conditions:
+                  - condition: template
+                    value_template: "{{ s3_enabled }}"
+                  - condition: time
+                    after: !input slot_3_start
+                    before: !input slot_3_end
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ s3_rgb != '[]' }}"
+                        sequence:
+                          - service: light.turn_on
+                            target:
+                               entity_id: !input light_entity
+                            data:
+                               brightness_pct: "{{ s3_brightness }}"
+                               rgb_color: "{{ s3_rgb }}"
+                      default:
+                        - service: light.turn_on
+                          target:
+                             entity_id: !input light_entity
+                          data:
+                             brightness_pct: "{{ s3_brightness }}"
+
+      # If triggered by motion OFF
+      - conditions:
+          - condition: state
+            entity_id: !input motion_entity
+            state: "off"
+        sequence:
+          - service: light.turn_off
+            target:
+              entity_id: !input light_entity
