@@ -1,7 +1,7 @@
 blueprint:
   name: "Adaptive Motion-Activated Light (AML)"
   author: "SpicyLimes"
-  description: "Trigger a light on motion with 3 different time slots for Color and Brightness settings. Each slot can be enabled or disabled."
+  description: "Trigger a Light via a Motion Sensor with adjustable time slots for Color and Brightness."
   source_url: https://github.com/SpicyLimes/Home-Assistant-Files/blob/main/Blueprints/Automations/Motion_Light_Time_Slots.yaml
   domain: automation
   input:
