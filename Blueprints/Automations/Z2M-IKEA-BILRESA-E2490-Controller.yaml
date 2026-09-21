@@ -1,0 +1,180 @@
+blueprint:
+  name: IKEA BILRESA Remote with Scroll Wheel (Zigbee2MQTT)
+  description: |
+    Control actions for the IKEA BILRESA remote control with scroll wheel (E2490)
+    via Zigbee2MQTT.
+
+    This remote ships as a Matter-over-Thread device but has an undocumented
+    Zigbee mode, which is what this blueprint targets. To pair it in Zigbee mode:
+      1. Hold the pair button ~10 seconds until the LEDs pulse amber (factory reset).
+      2. Press the pair button 4 times rapidly to enter Touchlink.
+      3. Press the pair button 8 times rapidly to join the Zigbee network.
+      (Have Zigbee2MQTT in permit-join first. There is no success indicator.)
+
+    Actions supported by this device's Zigbee firmware:
+      - Press top button        (on)
+      - Press bottom button     (off)
+      - Double-press top        (on_double)
+      - Double-press bottom     (off_double)
+      - Scroll wheel            (brightness_move_to_level, with an absolute level 1-255)
+
+    This device does NOT emit hold, long-press or release actions. The Zigbee
+    firmware is deliberately stripped down and exposes no such events.
+
+    The scroll wheel reports an ABSOLUTE level, not a relative step. The level is
+    stored on the remote and shared across all its channels, so the wheel acts as
+    a dial rather than an up/down rocker.
+
+    This blueprint triggers on the Zigbee2MQTT state topic rather than on HA device
+    triggers. That is deliberate: it gives access to the wheel's action_level value
+    (device triggers do not carry the payload), and it works immediately without
+    having to press every button once to make HA discover it.
+
+    Requires the Zigbee2MQTT Home Assistant integration to be enabled.
+  author: SpicyLimes
+  source_url: https://github.com/SpicyLimes/Home-Assistant-Files/blob/main/Blueprints/Automations/Z2M-IKEA-BILRESA-E2490-Controller.yaml
+  domain: automation
+  input:
+    remote_topic:
+      name: Zigbee2MQTT State Topic
+      description: >
+        The MQTT state topic for this remote: your Zigbee2MQTT base topic followed by
+        the device's friendly name. For a default install this looks like
+        "zigbee2mqtt/My Remote Name". The friendly name is shown in the Zigbee2MQTT
+        frontend under Devices. Do not add a trailing slash or "/action".
+      selector:
+        text:
+
+    on_actions:
+      name: Top Button - Single Press
+      description: Actions to run on a single press of the top button (action "on").
+      default: []
+      selector:
+        action: {}
+
+    off_actions:
+      name: Bottom Button - Single Press
+      description: Actions to run on a single press of the bottom button (action "off").
+      default: []
+      selector:
+        action: {}
+
+    on_double_actions:
+      name: Top Button - Double Press
+      description: Actions to run on a double press of the top button (action "on_double").
+      default: []
+      selector:
+        action: {}
+
+    off_double_actions:
+      name: Bottom Button - Double Press
+      description: Actions to run on a double press of the bottom button (action "off_double").
+      default: []
+      selector:
+        action: {}
+
+    wheel_lights:
+      name: Scroll Wheel - Lights to Dim
+      description: >
+        Optional. Lights whose brightness should follow the scroll wheel directly.
+        The wheel's reported level (1-255) maps 1:1 onto Home Assistant brightness.
+        Leave empty if you only want to use the custom wheel actions below.
+      default: {}
+      selector:
+        target:
+          entity:
+            domain: light
+
+    wheel_transition:
+      name: Scroll Wheel - Transition Time
+      description: >
+        Fade time in seconds applied when the wheel sets brightness. Keep this small;
+        the remote emits events roughly every 100-300 ms while turning, and a long
+        transition makes dimming feel laggy.
+      default: 0.3
+      selector:
+        number:
+          min: 0.0
+          max: 5.0
+          step: 0.1
+          unit_of_measurement: seconds
+          mode: slider
+
+    wheel_actions:
+      name: Scroll Wheel - Custom Actions
+      description: >
+        Optional. Extra actions to run on each wheel movement. Two variables are
+        available: "wheel_level" (1-255, as reported by the remote) and
+        "wheel_percent" (the same value as 0-100).
+      default: []
+      selector:
+        action: {}
+
+# The wheel emits a burst of events while turning. Queued keeps them in order so the
+# final brightness matches where the wheel stopped; silent overflow avoids log spam.
+mode: queued
+max: 25
+max_exceeded: silent
+
+triggers:
+  - trigger: mqtt
+    topic: !input remote_topic
+    id: remote
+
+variables:
+  wheel_targets: !input wheel_lights
+  wheel_level: "{{ trigger.payload_json.action_level | int(0) }}"
+  wheel_percent: "{{ ((trigger.payload_json.action_level | int(0)) / 255 * 100) | round(0) }}"
+
+conditions:
+  # Zigbee2MQTT publishes this topic for battery and link-quality updates too.
+  # Only continue when the payload actually carries an action.
+  - condition: template
+    value_template: >
+      {{ trigger.payload_json.action is defined
+         and trigger.payload_json.action not in [none, ''] }}
+
+actions:
+  - choose:
+      - alias: Top button - single press
+        conditions:
+          - condition: template
+            value_template: "{{ trigger.payload_json.action == 'on' }}"
+        sequence: !input on_actions
+
+      - alias: Bottom button - single press
+        conditions:
+          - condition: template
+            value_template: "{{ trigger.payload_json.action == 'off' }}"
+        sequence: !input off_actions
+
+      - alias: Top button - double press
+        conditions:
+          - condition: template
+            value_template: "{{ trigger.payload_json.action == 'on_double' }}"
+        sequence: !input on_double_actions
+
+      - alias: Bottom button - double press
+        conditions:
+          - condition: template
+            value_template: "{{ trigger.payload_json.action == 'off_double' }}"
+        sequence: !input off_double_actions
+
+      - alias: Scroll wheel
+        conditions:
+          - condition: template
+            value_template: "{{ trigger.payload_json.action == 'brightness_move_to_level' }}"
+        sequence:
+          - alias: Apply the wheel level to the selected lights
+            if:
+              - condition: template
+                value_template: "{{ wheel_targets | default({}, true) | count > 0 }}"
+            then:
+              - action: light.turn_on
+                target: !input wheel_lights
+                data:
+                  brightness: "{{ [[wheel_level, 1] | max, 255] | min }}"
+                  transition: !input wheel_transition
+          - alias: Custom wheel actions
+            sequence: !input wheel_actions
+    default: []
