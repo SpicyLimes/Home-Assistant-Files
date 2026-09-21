@@ -123,8 +123,11 @@ triggers:
 
 variables:
   wheel_targets: !input wheel_lights
-  wheel_level: "{{ trigger.payload_json.action_level | int(0) }}"
-  wheel_percent: "{{ ((trigger.payload_json.action_level | int(0)) / 255 * 100) | round(0) }}"
+  # action_level is present ONLY on scroll-wheel payloads. Variables render before
+  # conditions, so dereferencing it unguarded aborts the whole run for every button
+  # action. default(0) keeps these safe when the key is absent.
+  wheel_level: "{{ (trigger.payload_json.action_level | default(0)) | int(0) }}"
+  wheel_percent: "{{ ((((trigger.payload_json.action_level | default(0)) | int(0)) / 255) * 100) | round(0) | int(0) }}"
 
 conditions:
   # Zigbee2MQTT publishes this topic for battery and link-quality updates too.
