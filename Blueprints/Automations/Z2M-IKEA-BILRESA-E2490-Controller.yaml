@@ -379,9 +379,13 @@ actions:
               - condition: template
                 value_template: "{{ cycle_on_triple and mode_helper not in [none, ''] }}"
             then:
+              # Templated rather than `!input` directly: the input defaults to an
+              # empty string, and HA validates entity_id at blueprint-instantiation
+              # time, which would make every automation using the defaults fail to
+              # load. A template defers resolution to runtime, behind the guard above.
               - action: input_select.select_next
                 target:
-                  entity_id: !input scroll_mode_helper
+                  entity_id: "{{ mode_helper }}"
                 data:
                   cycle: true
             else:
