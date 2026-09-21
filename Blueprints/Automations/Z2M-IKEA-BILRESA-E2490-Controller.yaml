@@ -4,33 +4,53 @@ blueprint:
     Control actions for the IKEA BILRESA remote control with scroll wheel (E2490)
     via Zigbee2MQTT.
 
-    This remote ships as a Matter-over-Thread device but has an undocumented
-    Zigbee mode, which is what this blueprint targets. To pair it in Zigbee mode:
-      1. Hold the pair button ~10 seconds until the LEDs pulse amber (factory reset).
-      2. Press the pair button 4 times rapidly to enter Touchlink.
-      3. Press the pair button 8 times rapidly to join the Zigbee network.
-      (Have Zigbee2MQTT in permit-join first. There is no success indicator.)
+    IMPORTANT - how this remote actually behaves:
 
-    Actions supported by this device's Zigbee firmware:
-      - Press top button        (on)
-      - Press bottom button     (off)
-      - Double-press top        (on_double)
-      - Double-press bottom     (off_double)
-      - Scroll wheel            (brightness_move_to_level, with an absolute level 1-255)
+    The SCROLL WHEEL is the only button that reports to Zigbee2MQTT. It is both a
+    dial and a clickable button. The small bottom button sends NOTHING to the
+    network; it only cycles which bound group the remote controls locally.
 
-    This device does NOT emit hold, long-press or release actions. The Zigbee
-    firmware is deliberately stripped down and exposes no such events.
+      | Press          | Zigbee2MQTT action            |
+      | -------------- | ----------------------------- |
+      | Single click   | alternating "on" / "off"      |
+      | Double click   | "on_double"                   |
+      | Triple click   | "off_double"                  |
+      | Quad+ / Long   | nothing                       |
+      | Rotate         | n x "brightness_move_to_level"|
+      | Bottom button  | nothing                       |
 
-    The scroll wheel reports an ABSOLUTE level, not a relative step. The level is
-    stored on the remote and shared across all its channels, so the wheel acts as
-    a dial rather than an up/down rocker.
+    Single clicks ALTERNATE. The remote stores an on/off state per channel and
+    sends On, then Off, then On, and so on. It never sends Toggle. This keeps
+    group members in sync with each other, but it desynchronises if you also
+    control the lights from Home Assistant: the remote does not know you changed
+    anything, so the next click may send the state the light is already in.
 
-    This blueprint triggers on the Zigbee2MQTT state topic rather than on HA device
-    triggers. That is deliberate: it gives access to the wheel's action_level value
-    (device triggers do not carry the payload), and it works immediately without
-    having to press every button once to make HA discover it.
+      - For behaviour that survives desync, put light.toggle in "Any Single
+        Click" and leave the On/Off phase slots empty.
+      - For strict on/off, use the On Phase and Off Phase slots instead, and
+        accept that the remote can get one click out of step.
 
-    Requires the Zigbee2MQTT Home Assistant integration to be enabled.
+    Despite the names Zigbee2MQTT uses, "on_double" is a DOUBLE click and
+    "off_double" is a TRIPLE click. They are not two different buttons.
+
+    Long-pressing generates no Zigbee events at all - this is confirmed device
+    behaviour, not a pairing fault.
+
+    The wheel reports an ABSOLUTE level, not a relative step, so it acts as a
+    dial. The level is stored on the remote and shared across all channels.
+
+    Zigbee pairing (this remote ships as Matter over Thread; Zigbee mode is hidden
+    and unofficial - IKEA could remove it in an OTA update):
+      1. Hold the pair button (under the battery cover) ~10s until LEDs pulse amber.
+      2. Move it away from other IKEA devices, or power them off.
+      3. Press the pair button 4 times to enter Touchlink.
+      4. Press the pair button 8 times to join the Zigbee network.
+         LEDs turn off; there is no success indicator.
+
+    Notes: the buttons have low click sensitivity, so press firmly. Clicks carry a
+    built-in ~0.5s delay while the remote decides between single, double and triple.
+    The remote sleeps to save power and will not answer Zigbee2MQTT commands until
+    a button wakes it.
   author: SpicyLimes
   source_url: https://github.com/SpicyLimes/Home-Assistant-Files/blob/main/Blueprints/Automations/Z2M-IKEA-BILRESA-E2490-Controller.yaml
   domain: automation
@@ -38,47 +58,63 @@ blueprint:
     remote_topic:
       name: Zigbee2MQTT State Topic
       description: >
-        The MQTT state topic for this remote: your Zigbee2MQTT base topic followed by
-        the device's friendly name. For a default install this looks like
-        "zigbee2mqtt/My Remote Name". The friendly name is shown in the Zigbee2MQTT
-        frontend under Devices. Do not add a trailing slash or "/action".
+        The MQTT state topic for this remote: base topic plus the device's friendly
+        name, e.g. "zigbee2mqtt/My Remote Name". No trailing slash, no "/action".
       selector:
         text:
 
+    any_click_actions:
+      name: Wheel - Any Single Click
+      description: >
+        Runs on EVERY single click of the wheel, whether the remote sent "on" or
+        "off". This is usually what you want - pair it with light.toggle and the
+        remote cannot drift out of step. Leave the two phase slots below empty if
+        you use this.
+      default: []
+      selector:
+        action: {}
+
     on_actions:
-      name: Top Button - Single Press
-      description: Actions to run on a single press of the top button (action "on").
+      name: Wheel - Single Click, On Phase
+      description: >
+        Runs only when the single click sent "on". Use this with the Off Phase slot
+        for strict on/off control. Remember the remote alternates blindly, so this
+        can fall out of step if you control the lights elsewhere.
       default: []
       selector:
         action: {}
 
     off_actions:
-      name: Bottom Button - Single Press
-      description: Actions to run on a single press of the bottom button (action "off").
+      name: Wheel - Single Click, Off Phase
+      description: Runs only when the single click sent "off".
       default: []
       selector:
         action: {}
 
     on_double_actions:
-      name: Top Button - Double Press
-      description: Actions to run on a double press of the top button (action "on_double").
+      name: Wheel - Double Click
+      description: >
+        Runs on a double click (Zigbee2MQTT reports this as "on_double").
+        When bound directly, this recalls the NEXT scene on IKEA bulbs.
       default: []
       selector:
         action: {}
 
     off_double_actions:
-      name: Bottom Button - Double Press
-      description: Actions to run on a double press of the bottom button (action "off_double").
+      name: Wheel - Triple Click
+      description: >
+        Runs on a TRIPLE click (Zigbee2MQTT confusingly reports this as
+        "off_double"). When bound directly, this recalls the PREVIOUS scene on
+        IKEA bulbs.
       default: []
       selector:
         action: {}
 
     wheel_lights:
-      name: Scroll Wheel - Lights to Dim
+      name: Wheel Rotation - Lights to Dim
       description: >
-        Optional. Lights whose brightness should follow the scroll wheel directly.
-        The wheel's reported level (1-255) maps 1:1 onto Home Assistant brightness.
-        Leave empty if you only want to use the custom wheel actions below.
+        Optional. Lights whose brightness follows the wheel. The reported level
+        maps directly onto Home Assistant brightness, clamped to 1-254.
       default: {}
       selector:
         target:
@@ -86,11 +122,10 @@ blueprint:
             domain: light
 
     wheel_transition:
-      name: Scroll Wheel - Transition Time
+      name: Wheel Rotation - Transition Time
       description: >
-        Fade time in seconds applied when the wheel sets brightness. Keep this small;
-        the remote emits events roughly every 100-300 ms while turning, and a long
-        transition makes dimming feel laggy.
+        Fade time in seconds when the wheel sets brightness. Keep it small; the
+        remote emits events every 100-300 ms while turning.
       default: 0.3
       selector:
         number:
@@ -101,11 +136,10 @@ blueprint:
           mode: slider
 
     wheel_actions:
-      name: Scroll Wheel - Custom Actions
+      name: Wheel Rotation - Custom Actions
       description: >
-        Optional. Extra actions to run on each wheel movement. Two variables are
-        available: "wheel_level" (1-255, as reported by the remote) and
-        "wheel_percent" (the same value as 0-100).
+        Optional extra actions on each wheel movement. Variables "wheel_level"
+        (1-254) and "wheel_percent" (0-100) are available.
       default: []
       selector:
         action: {}
@@ -123,47 +157,60 @@ triggers:
 
 variables:
   wheel_targets: !input wheel_lights
-  # action_level is present ONLY on scroll-wheel payloads. Variables render before
-  # conditions, so dereferencing it unguarded aborts the whole run for every button
-  # action. default(0) keeps these safe when the key is absent.
+  # action_level exists ONLY on rotation payloads. Variables render BEFORE
+  # conditions, so dereferencing it unguarded raises UndefinedError and silently
+  # aborts the whole run for every click action. default(0) keeps these safe.
   wheel_level: "{{ (trigger.payload_json.action_level | default(0)) | int(0) }}"
-  wheel_percent: "{{ ((((trigger.payload_json.action_level | default(0)) | int(0)) / 255) * 100) | round(0) | int(0) }}"
+  wheel_percent: "{{ ((((trigger.payload_json.action_level | default(0)) | int(0)) / 254) * 100) | round(0) | int(0) }}"
+  # Which of the remote's three channels sent this, as a group id (21658-21660).
+  # Channels 2 and 3 only unlock after Touchlink binding.
+  channel_group: "{{ (trigger.payload_json.action_group | default(0)) | int(0) }}"
+  # 'on' or 'off' for a single click; empty for every other action.
+  click_state: >-
+    {{ trigger.payload_json.action if trigger.payload_json.action | default('') in ['on', 'off'] else '' }}
 
 conditions:
-  # Zigbee2MQTT publishes this topic for battery and link-quality updates too.
-  # Only continue when the payload actually carries an action.
+  # This topic also carries battery and link-quality updates with no action.
   - condition: template
     value_template: >
       {{ trigger.payload_json.action is defined
          and trigger.payload_json.action not in [none, ''] }}
 
 actions:
+  # Single clicks alternate on/off, so the "any click" slot runs for both phases
+  # before the phase-specific slots below.
+  - alias: Any single click
+    if:
+      - condition: template
+        value_template: "{{ click_state in ['on', 'off'] }}"
+    then: !input any_click_actions
+
   - choose:
-      - alias: Top button - single press
+      - alias: Single click - on phase
         conditions:
           - condition: template
             value_template: "{{ trigger.payload_json.action == 'on' }}"
         sequence: !input on_actions
 
-      - alias: Bottom button - single press
+      - alias: Single click - off phase
         conditions:
           - condition: template
             value_template: "{{ trigger.payload_json.action == 'off' }}"
         sequence: !input off_actions
 
-      - alias: Top button - double press
+      - alias: Double click
         conditions:
           - condition: template
             value_template: "{{ trigger.payload_json.action == 'on_double' }}"
         sequence: !input on_double_actions
 
-      - alias: Bottom button - double press
+      - alias: Triple click
         conditions:
           - condition: template
             value_template: "{{ trigger.payload_json.action == 'off_double' }}"
         sequence: !input off_double_actions
 
-      - alias: Scroll wheel
+      - alias: Wheel rotation
         conditions:
           - condition: template
             value_template: "{{ trigger.payload_json.action == 'brightness_move_to_level' }}"
@@ -173,10 +220,11 @@ actions:
               - condition: template
                 value_template: "{{ wheel_targets | default({}, true) | count > 0 }}"
             then:
+              # The remote can report 255, which is undefined for lights; 254 is max.
               - action: light.turn_on
                 target: !input wheel_lights
                 data:
-                  brightness: "{{ [[wheel_level, 1] | max, 255] | min }}"
+                  brightness: "{{ [[wheel_level, 1] | max, 254] | min }}"
                   transition: !input wheel_transition
           - alias: Custom wheel actions
             sequence: !input wheel_actions
