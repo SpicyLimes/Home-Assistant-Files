@@ -19,6 +19,24 @@ blueprint:
       | Rotate         | n x "brightness_move_to_level"|
       | Bottom button  | nothing                       |
 
+    THIS IS NOT THE E2489. The dual-button BILRESA is a different device with
+    mirror-opposite capabilities, and blueprints written for it will not work
+    here:
+
+      |               | E2489 dual button        | E2490 scroll wheel (this) |
+      | ------------- | ------------------------ | ------------------------- |
+      | Long press    | brightness_move_up/down  | nothing                   |
+      |               | + brightness_stop        |                           |
+      | Triple press  | nothing                  | off_double                |
+      | Rotation      | n/a                      | brightness_move_to_level  |
+
+    The button below the LEDs cycles the remote's three product groups, and the
+    lit LED count shows which is selected. Over Zigbee this is invisible to the
+    coordinator: actions do not identify the selected group, so Home Assistant
+    cannot tell groups apart and cannot see the button press itself. Groups 2
+    and 3 also stay locked until unlocked through Touchlink. Only Matter over
+    Thread exposes the three groups separately, as nine endpoints.
+
     Single clicks ALTERNATE. The remote stores an on/off state per channel and
     sends On, then Off, then On, and so on. It never sends Toggle. This keeps
     group members in sync with each other, but it desynchronises if you also
@@ -162,9 +180,9 @@ variables:
   # aborts the whole run for every click action. default(0) keeps these safe.
   wheel_level: "{{ (trigger.payload_json.action_level | default(0)) | int(0) }}"
   wheel_percent: "{{ ((((trigger.payload_json.action_level | default(0)) | int(0)) / 254) * 100) | round(0) | int(0) }}"
-  # Which of the remote's three channels sent this, as a group id (21658-21660).
-  # Channels 2 and 3 only unlock after Touchlink binding.
-  channel_group: "{{ (trigger.payload_json.action_group | default(0)) | int(0) }}"
+  # No channel/group variable is provided on purpose: over Zigbee the remote
+  # does not identify which of its three product groups is selected, so
+  # action_group is effectively a constant and cannot be used to branch.
   # 'on' or 'off' for a single click; empty for every other action.
   click_state: >-
     {{ trigger.payload_json.action if trigger.payload_json.action | default('') in ['on', 'off'] else '' }}
