@@ -177,26 +177,29 @@ conditions:
          and trigger.payload_json.action not in [none, ''] }}
 
 actions:
-  # Single clicks alternate on/off, so the "any click" slot runs for both phases
-  # before the phase-specific slots below.
-  - alias: Any single click
-    if:
-      - condition: template
-        value_template: "{{ click_state in ['on', 'off'] }}"
-    then: !input any_click_actions
-
   - choose:
+      # Single clicks alternate on/off. The "any click" slot runs inside BOTH
+      # phases. Note: an empty `sequence:` is valid, but an empty `then:` is not,
+      # so these must be nested sequences rather than an if/then wrapper.
       - alias: Single click - on phase
         conditions:
           - condition: template
             value_template: "{{ trigger.payload_json.action == 'on' }}"
-        sequence: !input on_actions
+        sequence:
+          - alias: Any single click
+            sequence: !input any_click_actions
+          - alias: On phase only
+            sequence: !input on_actions
 
       - alias: Single click - off phase
         conditions:
           - condition: template
             value_template: "{{ trigger.payload_json.action == 'off' }}"
-        sequence: !input off_actions
+        sequence:
+          - alias: Any single click
+            sequence: !input any_click_actions
+          - alias: Off phase only
+            sequence: !input off_actions
 
       - alias: Double click
         conditions:
