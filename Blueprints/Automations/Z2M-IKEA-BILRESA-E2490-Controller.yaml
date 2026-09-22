@@ -1,101 +1,65 @@
 blueprint:
   name: IKEA BILRESA Remote with Scroll Wheel (Zigbee2MQTT)
   description: |
-    Control actions for the IKEA BILRESA remote control with scroll wheel (E2490)
-    via Zigbee2MQTT.
-
-    IMPORTANT - how this remote actually behaves:
-
-    The SCROLL WHEEL is the only button that reports to Zigbee2MQTT. It is both a
-    dial and a clickable button. The small bottom button sends NOTHING to the
-    network; it only cycles which bound group the remote controls locally.
-
-      | Press          | Zigbee2MQTT action            |
-      | -------------- | ----------------------------- |
-      | Single click   | alternating "on" / "off"      |
-      | Double click   | "on_double"                   |
-      | Triple click   | "off_double"                  |
-      | Quad+ / Long   | nothing                       |
-      | Rotate         | n x "brightness_move_to_level"|
-      | Bottom button  | nothing                       |
-
-    THIS IS NOT THE E2489. The dual-button BILRESA is a different device with
-    mirror-opposite capabilities, and blueprints written for it will not work
-    here:
-
-      |               | E2489 dual button        | E2490 scroll wheel (this) |
-      | ------------- | ------------------------ | ------------------------- |
-      | Long press    | brightness_move_up/down  | nothing                   |
-      |               | + brightness_stop        |                           |
-      | Triple press  | nothing                  | off_double                |
-      | Rotation      | n/a                      | brightness_move_to_level  |
-
-    The button below the LEDs cycles the remote's three product groups, and the
-    lit LED count shows which is selected. Over Zigbee this is invisible to the
-    coordinator: actions do not identify the selected group, so Home Assistant
-    cannot tell groups apart and cannot see the button press itself. Only Matter
-    over Thread exposes the three groups separately, as nine endpoints.
-
-    Single clicks ALTERNATE. The remote stores an on/off state per channel and
-    sends On, then Off, then On, and so on. It never sends Toggle. This keeps
-    group members in sync with each other, but it desynchronises if you also
-    control the lights from Home Assistant.
-
-      - For behaviour that survives desync, put light.toggle in "Any Single
-        Click" and leave the On/Off phase slots empty.
-      - For strict on/off, use the On Phase and Off Phase slots instead.
+    Control actions for the IKEA BILRESA remote with scroll wheel (E2490) via Zigbee2MQTT.
 
     ------------------------------------------------------------------------
-    ROTATION: ABSOLUTE vs RELATIVE
+    Remote Behavior
     ------------------------------------------------------------------------
 
-    ABSOLUTE (default) uses the level the remote reports (1-255) directly. The
-    wheel behaves as a dial with a fixed position. Simple, needs no extra setup,
-    but the remote does not know if you changed the light elsewhere, so the next
-    turn snaps to the remote's own stored position.
+    The scroll wheel is the only control that reports to Zigbee2MQTT. It works as both a dial and a clickable button. The small bottom button sends nothing to the network; it only cycles which bound group the remote controls locally.
 
-    RELATIVE steps up or down by how far you turned, so it never snaps and never
-    desynchronises. A quick flick moves further than a slow nudge.
+      | Input          | Zigbee2MQTT Action             |
+      | -------------- | ------------------------------ |
+      | Single click   | Alternating "on" / "off"       |
+      | Double click   | "on_double"                    |
+      | Triple click   | "off_double"                   |
+      | Quad+ / long   | Nothing                        |
+      | Rotate         | n x "brightness_move_to_level" |
+      | Bottom button  | Nothing                        |
 
-    *** RELATIVE REQUIRES ONE SETTING IN ZIGBEE2MQTT ***
-    Open the device in Zigbee2MQTT -> Settings (specific) and put numbers in the
-    "Simulated brightness" Delta and Interval boxes (20 and 100 are fine). There
-    is no checkbox; the feature counts as enabled once the values exist. That
-    makes Zigbee2MQTT add "action_brightness_delta" to every rotation payload,
-    which is what relative mode reads. Without it, relative mode does nothing.
-    The Delta and Interval numbers themselves are ignored by this device - only
-    devices that send brightness_move_up/down use them.
+    Single clicks alternate. The remote stores an on/off state per channel and sends "on", then "off", then "on" again; it never sends a toggle. This keeps group members in sync with each other, but it falls out of sync if you also control the lights from Home Assistant.
 
-    Two measured quirks relative mode handles for you:
-      - The FIRST rotation after a Zigbee2MQTT restart reports a bogus delta,
-        because it is diffed against a seed of 255. "Max Delta" bounds the
-        damage to a single oversized step.
-      - At the extremes the remote clamps at 255 or 1 and keeps transmitting
-        with a delta of 0. The level is used to infer direction there, and
-        "Rail Step" sets how far each of those events moves.
+      - For behavior that survives this, put light.toggle in "Wheel - Any Single Click" and leave the On Phase and Off Phase slots empty.
+      - For strict on/off, use the "Wheel - Single Click, On Phase" and "Wheel - Single Click, Off Phase" slots instead.
 
     ------------------------------------------------------------------------
-    SCROLL MODES
+    Rotation: Absolute vs. Relative
     ------------------------------------------------------------------------
 
-    The wheel can drive brightness, colour temperature or hue. Point "Scroll
-    Mode Helper" at an input_select whose options are any of:
+    Absolute (the default) uses the level the remote reports (1-255) directly, so the wheel behaves as a dial with a fixed position. It is simple and needs no extra setup, but the remote does not know if you changed the light elsewhere, so the next turn snaps back to the remote's own stored position.
+
+    Relative steps up or down by how far you turned, so it never snaps and never falls out of sync. A quick flick moves further than a slow nudge.
+
+    *** RELATIVE MODE REQUIRES ONE SETTING IN ZIGBEE2MQTT ***
+    Open the device in Zigbee2MQTT, go to Settings (specific), and enter values in the "Simulated brightness" Delta and Interval fields (20 and 100 work well). There is no checkbox; the feature is enabled once the values are set. Zigbee2MQTT then adds "action_brightness_delta" to every rotation payload, which is what relative mode reads. Without it, relative mode does nothing. This device ignores the Delta and Interval values themselves; only devices that send brightness_move_up/down use them.
+
+    Relative mode handles two measured quirks for you:
+      - The first rotation after a Zigbee2MQTT restart reports a bogus delta, because it is compared against a starting value of 255. "Relative - Max Delta" limits the damage to a single oversized step.
+      - At either end of its range, the remote clamps at 255 or 1 and keeps transmitting with a delta of 0. The level is used to infer the direction there, and "Relative - Rail Step" sets how far each of those events moves.
+
+    ------------------------------------------------------------------------
+    Scroll Modes
+    ------------------------------------------------------------------------
+
+    The wheel can control brightness, color temperature, or hue. Point "Scroll Mode - Helper" at an input_select whose options are any of:
 
         brightness    color_temp    hue
 
-    Turn on "Triple Click Cycles Mode" and a triple click steps to the next
-    option, wrapping around. Double click stays free for your own actions.
+    Turn on "Scroll Mode - Triple Click Cycles" and a triple click advances to the next option, wrapping around at the end. Double click stays free for your own actions.
 
-    With no helper the mode is fixed to "Fallback Scroll Mode".
+    Without a helper, the mode is fixed to "Scroll Mode - Fallback".
 
-    Colour temperature and hue read the CURRENT value from the first entity in
-    your rotation target, so that target must include at least one entity (not
-    only areas or devices).
+    Color temperature and hue modes read the current value from the first entity in your rotation target, so that target must include at least one entity (not only areas or devices).
 
-    Notes: the buttons have low click sensitivity, so press firmly. Clicks carry
-    a built-in ~0.5s delay while the remote decides between single, double and
-    triple. The remote sleeps to save power and will not answer Zigbee2MQTT
-    commands until a button wakes it.
+    ------------------------------------------------------------------------
+    Other Notes and FYI's
+    ------------------------------------------------------------------------
+
+      - The wheel has low click sensitivity, so press firmly.
+      - Clicks have a built-in delay of about 0.5 seconds while the remote decides between single, double, and triple.
+      - The remote sleeps to save power and will not respond to Zigbee2MQTT commands until a button press wakes it.
+
   author: SpicyLimes
   source_url: https://github.com/SpicyLimes/Home-Assistant-Files/blob/main/Blueprints/Automations/Z2M-IKEA-BILRESA-E2490-Controller.yaml
   domain: automation
@@ -103,30 +67,32 @@ blueprint:
     remote_topic:
       name: Zigbee2MQTT State Topic
       description: >
-        The MQTT state topic for this remote: base topic plus the device's friendly
-        name, e.g. "zigbee2mqtt/My Remote Name". No trailing slash, no "/action".
+        The MQTT state topic for this remote: the Zigbee2MQTT base topic plus the
+        device's friendly name, e.g. "zigbee2mqtt/My Remote Name". Do not include a
+        trailing slash or "/action".
       selector:
         text:
 
     any_click_actions:
       name: Wheel - Any Single Click
       description: >
-        Runs on EVERY single click of the wheel, whether the remote sent "on" or
-        "off". Pair it with light.toggle and the remote cannot drift out of step.
+        Runs on every single click of the wheel, whether the remote sent "on" or
+        "off". Pair it with light.toggle so the remote cannot fall out of step with
+        the lights.
       default: []
       selector:
         action: {}
 
     on_actions:
       name: Wheel - Single Click, On Phase
-      description: Runs only when the single click sent "on".
+      description: Runs only when a single click sends "on".
       default: []
       selector:
         action: {}
 
     off_actions:
       name: Wheel - Single Click, Off Phase
-      description: Runs only when the single click sent "off".
+      description: Runs only when a single click sends "off".
       default: []
       selector:
         action: {}
@@ -141,32 +107,33 @@ blueprint:
     off_double_actions:
       name: Wheel - Triple Click
       description: >
-        Runs on a TRIPLE click (Zigbee2MQTT reports this as "off_double").
-        Ignored when "Triple Click Cycles Mode" is on.
+        Runs on a triple click (Zigbee2MQTT reports this as "off_double").
+        Ignored when "Scroll Mode - Triple Click Cycles" is on.
       default: []
       selector:
         action: {}
 
     rotation_mode:
-      name: Rotation Behaviour
+      name: Rotation - Behavior
       description: >
-        "absolute" uses the reported level as a dial position. "relative" steps by
-        how far you turned and never desynchronises, but needs Simulated
-        Brightness enabled in Zigbee2MQTT (see the description above).
+        Absolute uses the reported level as a dial position. Relative steps by how
+        far you turned and never falls out of sync, but requires Simulated
+        Brightness to be enabled in Zigbee2MQTT (see the blueprint description).
       default: absolute
       selector:
         select:
           options:
-            - label: Absolute - dial position (no extra setup)
+            - label: Absolute - Dial position (no extra setup)
               value: absolute
-            - label: Relative - proportional steps (needs Simulated Brightness)
+            - label: Relative - Proportional steps (requires Simulated Brightness)
               value: relative
 
     wheel_lights:
       name: Rotation - Lights to Control
       description: >
-        Lights the wheel adjusts. For colour temp and hue modes this must include
-        at least one entity, since the current value is read from the first one.
+        The lights the wheel adjusts. For color temperature and hue modes, this
+        must include at least one entity, because the current value is read from
+        the first one.
       default: {}
       selector:
         target:
@@ -176,7 +143,7 @@ blueprint:
     wheel_transition:
       name: Rotation - Transition Time
       description: >
-        Fade time in seconds. Keep it small; the remote emits events every
+        Fade time in seconds. Keep it short; the remote sends events every
         100-300 ms while turning.
       default: 0.3
       selector:
@@ -188,34 +155,34 @@ blueprint:
           mode: slider
 
     scroll_mode_helper:
-      name: Scroll Mode Helper
+      name: Scroll Mode - Helper
       description: >
-        Optional input_select whose options are drawn from: brightness,
-        color_temp, hue. Leave empty to use the fallback mode below.
+        Optional input_select whose options are any of: brightness, color_temp,
+        hue. Leave empty to use the fallback mode below.
       default: ""
       selector:
         entity:
           domain: input_select
 
     fallback_scroll_mode:
-      name: Fallback Scroll Mode
-      description: Used when no helper is set, or the helper is unavailable.
+      name: Scroll Mode - Fallback
+      description: Used when no helper is set or the helper is unavailable.
       default: brightness
       selector:
         select:
           options:
             - label: Brightness
               value: brightness
-            - label: Colour Temperature
+            - label: Color Temperature
               value: color_temp
             - label: Hue
               value: hue
 
     cycle_mode_on_triple:
-      name: Triple Click Cycles Mode
+      name: Scroll Mode - Triple Click Cycles
       description: >
-        When on, a triple click advances the helper to its next option and the
-        Triple Click action slot is not run.
+        When on, a triple click advances the helper to its next option, and the
+        "Wheel - Triple Click" actions do not run.
       default: false
       selector:
         boolean:
@@ -223,22 +190,26 @@ blueprint:
     sensitivity_brightness:
       name: Sensitivity - Brightness
       description: >
-        100% means a full sweep of the wheel spans the full brightness range.
+        At 100%, one full sweep of the wheel covers the entire brightness range.
         Relative mode only.
       default: 100
       selector:
         number: {min: 10, max: 300, step: 5, unit_of_measurement: "%", mode: slider}
 
     sensitivity_color_temp:
-      name: Sensitivity - Colour Temperature
-      description: 100% means a full sweep spans the light's whole Kelvin range.
+      name: Sensitivity - Color Temperature
+      description: >
+        At 100%, one full sweep covers the light's entire Kelvin range. Relative
+        mode only.
       default: 100
       selector:
         number: {min: 10, max: 300, step: 5, unit_of_measurement: "%", mode: slider}
 
     sensitivity_hue:
       name: Sensitivity - Hue
-      description: 100% means a full sweep travels once around the colour wheel.
+      description: >
+        At 100%, one full sweep goes once around the color wheel. Relative mode
+        only.
       default: 100
       selector:
         number: {min: 10, max: 300, step: 5, unit_of_measurement: "%", mode: slider}
@@ -246,9 +217,9 @@ blueprint:
     max_delta:
       name: Relative - Max Delta
       description: >
-        Caps how far one event may move, in the remote's 0-255 units. This is what
-        bounds the bogus first reading after a Zigbee2MQTT restart. Measured real
-        turns ranged about 14 (gentle) to 70 (fast).
+        Limits how far a single event can move, in the remote's 0-255 units. This
+        is what contains the bogus first reading after a Zigbee2MQTT restart.
+        Measured real turns ranged from about 14 (gentle) to 70 (fast).
       default: 60
       selector:
         number: {min: 5, max: 255, step: 5, mode: slider}
@@ -257,14 +228,15 @@ blueprint:
       name: Relative - Rail Step
       description: >
         How far to move per event while the wheel is pinned at its maximum or
-        minimum, where the remote reports a delta of 0. Set to 0 to ignore those.
+        minimum, where the remote reports a delta of 0. Set to 0 to ignore those
+        events.
       default: 10
       selector:
         number: {min: 0, max: 60, step: 1, mode: slider}
 
     min_brightness:
-      name: Minimum Brightness
-      description: Scrolling down will not take the light below this (1-254).
+      name: Rotation - Minimum Brightness
+      description: Scrolling down will not take the light below this level (1-254).
       default: 3
       selector:
         number: {min: 1, max: 254, step: 1, mode: slider}
@@ -272,8 +244,9 @@ blueprint:
     wheel_actions:
       name: Rotation - Custom Actions
       description: >
-        Extra actions on each wheel movement. Variables available: wheel_level
-        (1-255), raw_delta, direction (-1/0/1), frac (-1.0..1.0) and scroll_mode.
+        Extra actions to run on each wheel movement. Available variables:
+        wheel_level (1-255), raw_delta, direction (-1/0/1), frac (-1.0 to 1.0), and
+        scroll_mode.
       default: []
       selector:
         action: {}
@@ -311,7 +284,7 @@ variables:
   click_state: >-
     {{ trigger.payload_json.action if trigger.payload_json.action | default('') in ['on', 'off'] else '' }}
 
-  # First entity of the rotation target, used to read current colour temp / hue.
+  # First entity of the rotation target, used to read the current color temp / hue.
   ref_entity: >-
     {% set ids = (wheel_targets | default({}, true)).entity_id | default([]) %}
     {% set ids = [ids] if ids is string else ids %}
@@ -418,7 +391,7 @@ actions:
                           brightness: "{{ [[wheel_level, min_bri | int(1)] | max, 254] | min }}"
                           transition: !input wheel_transition
 
-                  - alias: Absolute - colour temperature
+                  - alias: Absolute - color temperature
                     conditions:
                       - condition: template
                         value_template: "{{ rot_mode == 'absolute' and scroll_mode == 'color_temp' }}"
@@ -462,7 +435,7 @@ actions:
                             {{ [[nxt, min_bri | int(1)] | max, 254] | min }}
                           transition: !input wheel_transition
 
-                  - alias: Relative - colour temperature
+                  - alias: Relative - color temperature
                     conditions:
                       - condition: template
                         value_template: "{{ rot_mode == 'relative' and scroll_mode == 'color_temp' }}"
